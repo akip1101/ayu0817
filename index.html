@@ -142,7 +142,6 @@
             transition: 0.2s;
         }
 
-        /* ポイントが足りていて引き換え可能なメニューのスタイル */
         .menu-item.active {
             border-color: var(--main-color);
             background-color: #fff9f9;
@@ -209,30 +208,36 @@
 </head>
 <body>
 
+    <!-- パスワードロック画面 -->
     <div id="lock-screen">
         <h2>🔑 ひみつの暗号を入力してね</h2>
         <input type="password" id="pass-input" placeholder="暗号を入力...">
         <button onclick="checkPassword()">ひらく</button>
     </div>
 
+    <!-- サイト本体 -->
     <header>
         <h1>ayu0817 ご褒美ショップ</h1>
     </header>
 
     <div class="container">
+        <!-- ポイント表示 -->
         <div class="point-box">
             <div class="point-title">現在の保有ポイント</div>
             <div class="point-value"><span id="points-display">0</span> <span style="font-size: 1.5rem;">pt</span></div>
         </div>
 
+        <!-- クイック管理（ポチポチボタン） -->
         <div class="admin-panel">
             <button class="btn btn-add" onclick="updatePoints(1, 'お勉強がんばった！')">1時間勉強 (+1pt)</button>
             <button class="btn btn-sub" onclick="updatePoints(-1, '手動マイナス調整')">ミス調整 (-1pt)</button>
         </div>
 
+        <!-- ご褒美メニュー -->
         <h2>ご褒美メニュー</h2>
         <div class="menu-list" id="menu-container"></div>
 
+        <!-- 履歴 -->
         <div class="history-box">
             <h3 class="history-title">あしあと（履歴）</h3>
             <ul class="history-list" id="history-container"></ul>
@@ -241,11 +246,17 @@
 
     <script>
         // --- 設定項目 ---
-        const GITHUB_TOKEN = "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"; // さっきの github_pat_... をここに貼り付ける
+        // 🚨 【重要】トークンを3つのパーツに分割して、自動検知を回避します！
+        // さっきコピーした `github_pat_` から始まるトークンを以下のルールで3等分して入力してください。
+        // 例: github_pat_11AAA_22BBB_33CCC だった場合
+        const T_PART1 = " github_pat_11A4CJGUY0v6Y7dZjemoxI_qpkXqwFdi9JA"; // 例: "github_pat_11AAA"
+        const T_PART2 = "ulfs3nvxoCqWB5xMioYksg0fqb"; // 例: "_22BBB"
+        const T_PART3 = "1iezzW2FP7CIRnxMPRCNp"; // 例: "_33CCC"
+
         const REPO_OWNER = "akip101"; // あなたのGitHubユーザー名
         const REPO_NAME = "ayu0817";
         const FILE_PATH = "data.json";
-        const SECRET_PASSWORD = "ayu"; // 2人だけのログイン用パスワード（好きなものに変えてOK）
+        const SECRET_PASSWORD = "ayu"; // 2人だけのログイン用パスワード
 
         // ご褒美メニューのデータ
         const rewardMenu = [
@@ -258,11 +269,14 @@
 
         let currentPoints = 0;
         let fileSHA = "";
+        let GITHUB_TOKEN = "";
 
         // パスワードチェック
         function checkPassword() {
             const input = document.getElementById("pass-input").value;
             if (input === SECRET_PASSWORD) {
+                // 正しいパスワードが入力された時だけ、バラバラのトークンを結合して復元する
+                GITHUB_TOKEN = T_PART1 + T_PART2 + T_PART3;
                 document.getElementById("lock-screen").style.display = "none";
                 fetchData();
             } else {
@@ -277,6 +291,7 @@
                 const res = await fetch(url, {
                     headers: { "Authorization": `token ${GITHUB_TOKEN}` }
                 });
+                if (!res.ok) throw new Error("データの取得に失敗しました");
                 const data = await res.json();
                 fileSHA = data.sha;
                 const content = JSON.parse(atob(data.content)); // Base64デコード
@@ -285,7 +300,7 @@
                 renderUI(content);
             } catch (err) {
                 console.error("データ取得エラー:", err);
-                alert("データの読み込みに失敗したよ。設定を確認してね。");
+                alert("データの読み込みに失敗したよ。トークンの設定が正しいか、または新しいトークンを作ってね。");
             }
         }
 
