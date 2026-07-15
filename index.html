@@ -3,19 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ayu0817 ポイント管理</title>
+    <title>ayu0817</title>
+    <!-- Google Fonts: 現代的で美しい「Inter」を導入 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKの読み込み (CDN経由) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-color: #fef8f8;
-            --main-color: #ff9a9e;
-            --main-dark: #f6416c;
-            --text-color: #4a4a4a;
-            --card-bg: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            --text-color: #1a1e24;
+            --text-muted: #7d8590;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --accent-pink: #ff5e7e;
+            --btn-add: #2ecc71;
+            --btn-sub: #e74c3c;
+            --border-color: rgba(0, 0, 0, 0.04);
+            --slider-bg: rgba(0, 0, 0, 0.06);
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -23,314 +37,1172 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             width: 90%;
-            max-width: 500px;
-            margin: 40px auto;
+            max-width: 400px;
+            margin: 80px auto;
         }
 
-        /* パスワードロック画面 */
+        /* 🔒 映画のワンシーンのような美しいロック画面 */
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
+            background: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #lock-screen h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--text-muted);
+            margin-bottom: 50px;
+            text-transform: uppercase;
         }
 
         #lock-screen input {
-            padding: 10px;
-            font-size: 1rem;
-            border: 2px solid var(--main-color);
-            border-radius: 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid #e1e4e8;
+            padding: 12px 0;
+            font-size: 1.6rem;
+            width: 200px;
             text-align: center;
-            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.4em;
+            margin-bottom: 45px;
+            font-weight: 300;
+        }
+
+        #lock-screen input:focus {
+            border-bottom-color: var(--text-color);
         }
 
         #lock-screen button {
-            background-color: var(--main-dark);
+            background-color: var(--text-color);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 14px 44px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
 
-        /* メインUI */
+        #lock-screen button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+        }
+
+        /* 📊 統計表示エリア (美しく整列したグラスモフィズム) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
         .point-box {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 32px 16px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            border: 2px solid #ffe3e3;
+            box-shadow: var(--card-shadow);
+            border: var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .point-title {
-            font-size: 1rem;
-            color: #999;
-            font-weight: bold;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
         }
 
         .point-value {
-            font-size: 4.5rem;
-            font-weight: bold;
-            color: var(--main-dark);
-            margin: 15px 0;
+            font-size: 3.2rem;
+            font-weight: 300;
+            color: var(--text-color);
+            margin: 12px 0 0 0;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            letter-spacing: -0.05em;
         }
 
-        /* 調整ボタン */
-        .admin-panel {
+        .point-unit {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-left: 4px;
+            color: var(--text-muted);
+            letter-spacing: 0;
+        }
+
+        /* 📈 進捗ゲージエリア */
+        .progress-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px 28px;
+            border: var(--glass-border);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+        }
+
+        .progress-header {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 30px;
+            align-items: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            letter-spacing: 0.12em;
         }
 
-        .btn {
-            flex: 1;
-            border: none;
-            padding: 15px 10px;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: bold;
+        .progress-bar-bg {
+            background: rgba(0, 0, 0, 0.04);
+            height: 6px;
+            border-radius: 3px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--text-color);
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* セクションラベル */
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            margin: 32px 0 12px 8px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        /* ⚙️ 操作パネル */
+        .admin-panel-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .control-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px 28px;
+            border: var(--glass-border);
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-color);
+            letter-spacing: -0.01em;
+        }
+
+        .val-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            letter-spacing: -0.01em;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 💡 操作中（スライダーを動かしているとき）にバッジを少しだけ際立たせる */
+        .slider:active ~ .slider-header .val-badge,
+        .control-box:focus-within .val-badge {
+            transform: scale(1.1);
+        }
+
+        .val-badge-study {
+            color: white;
+            background: var(--text-color);
+        }
+
+        .val-badge-reward {
+            color: var(--text-muted);
+            background: rgba(125, 133, 144, 0.08);
+        }
+
+        .val-badge-adjust {
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        /* 🎛️ スライダーの極上デザイン化 */
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--slider-bg);
+            outline: none;
+            margin: 14px 0;
+            transition: background 0.3s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .btn:active {
-            transform: scale(0.95);
+        .slider::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         }
 
-        .btn-add { background-color: #4caf50; color: white; }
-        .btn-add:hover { background-color: #43a047; }
-        
-        .btn-sub { background-color: #f44336; color: white; }
-        .btn-sub:hover { background-color: #e53935; }
+        /* 🔘 プレミアム実行ボタン */
+        .btn-execute {
+            background-color: var(--text-color);
+            color: white;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        .btn-execute:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .btn-execute:active {
+            transform: translateY(1px);
+        }
 
-        /* 履歴（タイムライン） */
+        /* 📝 履歴リスト */
         .history-box {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid #f0f0f0;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 28px 32px;
+            box-shadow: var(--card-shadow);
+            border: var(--glass-border);
+            margin-bottom: 28px;
         }
 
         .history-title {
             margin-top: 0;
-            font-size: 1.1rem;
-            border-bottom: 2px solid #ffe3e3;
-            padding-bottom: 8px;
-            color: var(--text-color);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
         }
 
         .history-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 250px;
+            max-height: 280px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
         }
 
         .history-item {
-            font-size: 0.9rem;
-            padding: 12px 0;
-            border-bottom: 1px solid #f9f9f9;
+            font-size: 0.85rem;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .history-date { color: #aaa; font-size: 0.8rem; }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .history-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pt-badge {
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-delete-log {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 6px;
+            color: var(--text-muted);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+        }
+
+        .btn-delete-log:hover {
+            color: var(--btn-sub);
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        /* ⚠️ 危険・管理ゾーン (ノイズ感を徹底排除) */
+        .danger-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-top: 24px;
+            margin-bottom: 80px;
+        }
+
+        .btn-secondary-action {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 230px;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-secondary-action:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.08);
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 230px;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-danger:hover {
+            background-color: rgba(231, 76, 60, 0.03);
+            border-color: rgba(231, 76, 60, 0.2);
+        }
+
+        /* 💬 グラスモフィズム・ダイアログ/モーダル */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 32px;
+            padding: 36px 32px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            text-align: center;
+            box-sizing: border-box;
+            border: var(--glass-border);
+        }
+
+        .modal-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0 0 12px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 28px 0;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.03);
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            letter-spacing: 0.15em;
+            margin-bottom: 28px;
+            transition: background 0.3s;
+        }
+
+        .modal-input:focus {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .modal-btn-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-btn-cancel {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-color);
+        }
+
+        .modal-btn-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* 💾 バックアップ管理用ビュー */
+        .backup-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 24px;
+            text-align: left;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 16px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            font-size: 0.75rem;
+        }
+
+        .backup-item:last-child {
+            border-bottom: none;
+        }
+
+        .backup-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .backup-restore-btn {
+            background: var(--text-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .backup-restore-btn:hover {
+            opacity: 0.85;
+        }
     </style>
 </head>
 <body>
 
+    <!-- ロック画面 -->
     <div id="lock-screen">
-        <h2>🔑 ひみつの暗号を入力してね</h2>
-        <input type="password" id="pass-input" placeholder="暗号を入力...">
-        <button onclick="checkPassword()">ひらく</button>
+        <h2>ENTER PASSWORD</h2>
+        <input type="password" id="pass-input">
+        <button onclick="checkPassword()">UNLOCK</button>
     </div>
 
+    <!-- 🔒 確認モーダル -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 class="modal-title">システム初期化</h3>
+            <p class="modal-desc">現在のポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。データはリセット直前にバックアップへ自動保存されます。</p>
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">キャンセル</button>
+                <button class="modal-btn modal-btn-confirm" onclick="openPasswordModal('reset')">初期化を実行</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔒 パスワード入力用モーダル -->
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 class="modal-title">管理者認証</h3>
+            <p class="modal-desc">セキュリティ保護のため、パスワードを入力してください。</p>
+            <input type="password" id="reset-pass-input" class="modal-input">
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-cancel" onclick="closePasswordModal()">キャンセル</button>
+                <button class="modal-btn modal-btn-confirm" id="pwd-modal-confirm-btn">実行する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💾 バックアップ管理モーダル -->
+    <div id="backup-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 360px;">
+            <h3 class="modal-title">バックアップ管理</h3>
+            <p class="modal-desc">安全に自動退避された直近3つまでの履歴データから選択して復元します。</p>
+            
+            <div class="backup-list-container" id="backup-list">
+                <div style="text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.8rem;">バックアップはありません</div>
+            </div>
+
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-cancel" onclick="closeBackupModal()" style="width: 100%;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
     <div class="container">
-        <div class="point-box">
-            <div class="point-title">現在の保有ポイント</div>
-            <div class="point-value"><span id="points-display">0</span> <span style="font-size: 1.8rem;">pt</span></div>
+        <!-- 統計表示 -->
+        <div class="stats-grid">
+            <div class="point-box">
+                <div class="point-title">Balance</div>
+                <div class="point-value">
+                    <span id="points-display">0</span>
+                    <span class="point-unit">pt</span>
+                </div>
+            </div>
+            <div class="point-box">
+                <div class="point-title">Total Study</div>
+                <div class="point-value" style="font-size: 2.1rem; font-weight: 300; margin-top: 18px;">
+                    <span id="total-study-display">0h 00m</span>
+                </div>
+            </div>
         </div>
 
-        <div class="admin-panel">
-            <button class="btn btn-add" onclick="updatePoints(1, 'お勉強がんばった！')">1時間勉強 (+1pt)</button>
-            <button class="btn btn-sub" onclick="updatePoints(-1, 'ミス調整')">ミス調整 (-1pt)</button>
+        <!-- 週次目標プログレスバー -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <span>GOAL PROGRESS (45h/Week)</span>
+                <span id="progress-percent-label">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
         </div>
 
+        <!-- コントロールパネル -->
+        <div class="admin-panel-grid">
+            <!-- STUDY -->
+            <div class="section-label">STUDY</div>
+            <div class="control-box">
+                <div class="slider-header">
+                    <span class="slider-title">学習記録の追加:</span>
+                    <span id="study-val-label" class="val-badge val-badge-study">+1 pt</span>
+                </div>
+                <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="updateStudyLabel(this.value)">
+                <button class="btn-execute" onclick="executeStudy()">選択した学習時間を記録する</button>
+            </div>
+
+            <!-- REWARD -->
+            <div class="section-label">REWARD</div>
+            <div class="control-box">
+                <div class="slider-header">
+                    <span class="slider-title">ご褒美の使用ポイント:</span>
+                    <span id="reward-val-label" class="val-badge val-badge-reward">-1 pt</span>
+                </div>
+                <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="updateRewardLabel(this.value)">
+                <!-- 💡 実行ボタンの背景色をアッシュグレー（var(--text-muted)）に統一しました -->
+                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeReward()">選択したポイントで使用する</button>
+            </div>
+
+            <!-- ADJUST -->
+            <div class="section-label">ADJUST</div>
+            <div class="control-box">
+                <div class="slider-header">
+                    <span class="slider-title">誤記録の調整（減算）:</span>
+                    <span id="adjust-val-label" class="val-badge val-badge-adjust">-0.5 pt</span>
+                </div>
+                <input type="range" id="adjust-range" class="slider" min="0.5" max="5" step="0.5" value="0.5" oninput="updateAdjustLabel(this.value)">
+                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">選択した時間・ポイントを減らす</button>
+            </div>
+        </div>
+
+        <!-- 履歴表示 -->
         <div class="history-box">
-            <h3 class="history-title">あしあと（履歴）</h3>
+            <h3 class="history-title">Log History</h3>
             <ul class="history-list" id="history-container"></ul>
+        </div>
+
+        <!-- セーフティ領域 -->
+        <div class="danger-zone">
+            <button class="btn-secondary-action" onclick="openPasswordModal('backup')">💾 バックアップを復元する</button>
+            <button class="btn-danger" onclick="triggerResetFlow()">システム全体の完全初期化</button>
         </div>
     </div>
 
     <script>
-        // --- 設定項目 ---
-        // 🔒 セキュリティフィルター回避用の3分割トークン
+        // --- Firebaseの設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
+            authDomain: "gohoubipt.firebaseapp.com",
+            databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "gohoubipt",
+            storageBucket: "gohoubipt.appspot.com",
+            messagingSenderId: "133130532450",
+            appId: "1:133130532450:web:41476b156bb892e62e833b",
+            measurementId: "G-DRQR6ZJQLE"
+        };
 
-       
-        const T_PART1 = "github_pat_11A4CJGUY0zTDoupTZ7o6i_c"; 
-        const T_PART2 = "y6dbvaNLwvNH0rot1nglzsG9SepizTs3X"; 
-        const T_PART3 = "cDHgiFXLYW3YPQFZTcd5Cx2s7"; 
-
-        const REPO_OWNER = "akip1101"; // あなたのGitHubユーザー名
-        const REPO_NAME = "ayu0817";
-        const FILE_PATH = "data.json";
-        const SECRET_PASSWORD = "ayu"; // 2人だけのログイン用パスワード
-
+        const SECRET_PASSWORD = "ayu"; 
+        const GOAL_HOURS = 45; 
+        let db;
         let currentPoints = 0;
-        let fileSHA = "";
-        let GITHUB_TOKEN = "";
+        let rawHistoryMap = {}; 
+        let pendingActionType = 'reset';
 
-        // パスワードチェック
+        // パスワードチェック (ロック解除)
         function checkPassword() {
-            const input = document.getElementById("pass-input").value;
-            if (input === SECRET_PASSWORD) {
-                // パスワードが一致したときだけトークンを合体・復元
-                GITHUB_TOKEN = T_PART1 + T_PART2 + T_PART3;
-                document.getElementById("lock-screen").style.display = "none";
-                fetchData();
+            const inputEl = document.getElementById("pass-input");
+            const password = inputEl.value;
+            
+            if (password === SECRET_PASSWORD) {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                
+                document.getElementById("lock-screen").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("lock-screen").style.display = "none";
+                }, 500);
+                startListening();
+                // 起動時に自動でバックアップを作成（最大3件維持）
+                setTimeout(autoCreateBackup, 3000);
             } else {
-                alert("暗号がちがうよ！");
+                alert("認証エラー：パスワードが一致しません。");
+                inputEl.value = "";
+                setTimeout(() => {
+                    inputEl.focus();
+                }, 50);
             }
         }
 
-        // GitHubから最新のデータを取得
-        async function fetchData() {
-            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-            try {
-                const res = await fetch(url, {
-                    headers: { "Authorization": `token ${GITHUB_TOKEN}` }
-                });
-                if (!res.ok) throw new Error("データの取得に失敗しました");
-                const data = await res.json();
-                fileSHA = data.sha;
+        document.getElementById("pass-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        });
+
+        function startListening() {
+            db.ref("data").on("value", (snapshot) => {
+                const content = snapshot.val();
                 
-                // 文字化けを防ぐUTF-8デコード処理
-                const base64Content = data.content.replace(/\s/g, '');
-                const binaryString = atob(base64Content);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
+                if (content) {
+                    currentPoints = content.points || 0;
+                    rawHistoryMap = content.history || {};
+                    renderUI(currentPoints, rawHistoryMap);
+                } else {
+                    const initialData = {
+                        points: 0,
+                        history: {
+                            "init": { date: new Date().toLocaleDateString('ja-JP'), action: "初期登録", points: 0, timestamp: Date.now() }
+                        }
+                    };
+                    db.ref("data").set(initialData);
                 }
-                const content = JSON.parse(new TextDecoder().decode(bytes));
-                
-                currentPoints = content.points;
-                renderUI(content);
-            } catch (err) {
-                console.error("データ取得エラー:", err);
-                alert("データの読み込みに失敗したよ。設定を確認してね。");
-            }
+            }, (error) => {
+                console.error("Firebase Read Error:", error);
+                alert("データベース同期に失敗しました。");
+            });
         }
 
-        // 画面の更新
-        function renderUI(data) {
-            document.getElementById("points-display").innerText = data.points;
+        function getStartOfWeekTimestamp() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); 
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - dayOfWeek);
+            startOfWeek.setHours(0, 0, 0, 0); 
+            return startOfWeek.getTime();
+        }
 
-            // 履歴の表示
+        function calculateTotalStudyMinutes(historyArray) {
+            let totalMinutes = 0;
+            historyArray.forEach(item => {
+                if (item.action === '30分勉強') {
+                    totalMinutes += 30;
+                } else if (item.action === '1時間勉強') {
+                    totalMinutes += 60;
+                } else if (item.action === '3時間勉強') {
+                    totalMinutes += 180;
+                } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
+                    const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
+                    const subMatch = item.action.match(/調整（勉強時間([\d.]+)h減）/);
+                    
+                    if (addMatch) {
+                        totalMinutes += (parseFloat(addMatch[1]) * 60);
+                    } else if (subMatch) {
+                        totalMinutes -= (parseFloat(subMatch[1]) * 60);
+                    }
+                } else if (item.action === '時間調整（勉強時間1h減）') {
+                    totalMinutes -= 60;
+                }
+            });
+            return totalMinutes < 0 ? 0 : totalMinutes;
+        }
+
+        function calculateWeeklyStudyMinutes(historyArray) {
+            const startOfWeekTime = getStartOfWeekTimestamp();
+            let weeklyMinutes = 0;
+
+            historyArray.forEach(item => {
+                const itemTime = item.timestamp ? item.timestamp : new Date(item.date).getTime();
+                
+                if (itemTime >= startOfWeekTime) {
+                    if (item.action === '30分勉強') {
+                        weeklyMinutes += 30;
+                    } else if (item.action === '1時間勉強') {
+                        weeklyMinutes += 60;
+                    } else if (item.action === '3時間勉強') {
+                        weeklyMinutes += 180;
+                    } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
+                        const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
+                        const subMatch = item.action.match(/調整（勉強時間([\d.]+)h減）/);
+                        
+                        if (addMatch) {
+                            weeklyMinutes += (parseFloat(addMatch[1]) * 60);
+                        } else if (subMatch) {
+                            weeklyMinutes -= (parseFloat(subMatch[1]) * 60);
+                        }
+                    } else if (item.action === '時間調整（勉強時間1h減）') {
+                        weeklyMinutes -= 60;
+                    }
+                }
+            });
+            return weeklyMinutes < 0 ? 0 : weeklyMinutes;
+        }
+
+        function renderUI(points, historyMap) {
+            document.getElementById("points-display").innerText = points;
+
+            const historyList = Object.keys(historyMap).map(key => ({
+                key: key,
+                ...historyMap[key]
+            }));
+
+            const totalMinutes = calculateTotalStudyMinutes(historyList);
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("total-study-display").innerText = `${hours}h ${formattedMinutes}m`;
+
+            const weeklyMinutes = calculateWeeklyStudyMinutes(historyList);
+            const weeklyHoursFloat = weeklyMinutes / 60;
+            let percent = Math.floor((weeklyHoursFloat / GOAL_HOURS) * 100);
+            if (percent > 100) percent = 100;
+            document.getElementById("progress-bar-fill").style.width = `${percent}%`;
+            document.getElementById("progress-percent-label").innerText = `${percent}%`;
+
             const historyContainer = document.getElementById("history-container");
             historyContainer.innerHTML = "";
-            const reversedHistory = [...data.history].reverse();
+            const reversedHistory = [...historyList].reverse();
             reversedHistory.forEach(item => {
+                if (item.key === "init") return;
+
                 const li = document.createElement("li");
                 li.className = "history-item";
+                
                 let ptText = item.points > 0 ? `+${item.points}pt` : `${item.points}pt`;
                 if (item.points === 0) ptText = "";
+                
                 li.innerHTML = `
-                    <span>${item.action}</span>
-                    <span style="font-weight:bold; color:${item.points > 0 ? '#4caf50' : '#f44336'}">${ptText}</span>
+                    <div class="history-left">
+                        <span style="color: var(--text-color); font-weight: 500;">${item.action}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">${item.date}</span>
+                    </div>
+                    <div class="history-right">
+                        <span class="pt-badge" style="color:${item.points > 0 ? 'var(--btn-add)' : 'var(--btn-sub)'}">${ptText}</span>
+                        <button class="btn-delete-log" onclick="deleteHistoryItem('${item.key}')" title="この記録を取り消す">🗑️</button>
+                    </div>
                 `;
                 historyContainer.appendChild(li);
             });
         }
 
-        // ポイントの更新処理（加算・減算）
-        async function updatePoints(amount, actionName) {
+        function updatePoints(amount, actionName) {
             if (amount < 0 && currentPoints + amount < 0) {
-                alert("ポイントが足りないよ！");
+                alert("累積ポイントの残高が不足しています。");
                 return;
             }
 
+            autoCreateBackup();
+
             const today = new Date().toLocaleDateString('ja-JP');
+            const nowTimestamp = Date.now(); 
             const newPoints = currentPoints + amount;
 
-            // データを取得し直して最新のSHAを確保
-            await fetchData();
-
-            const updatedData = {
-                points: newPoints,
-                history: [
-                    ...await getHistoryRaw(),
-                    { date: today, action: actionName, points: amount }
-                ]
+            const newHistoryItem = {
+                date: today,
+                timestamp: nowTimestamp,
+                action: actionName,
+                points: amount
             };
 
-            await saveToGitHub(updatedData);
+            db.ref("data").transaction((currentData) => {
+                if (currentData) {
+                    currentData.points = newPoints;
+                    if (!currentData.history) {
+                        currentData.history = {};
+                    }
+                    const newKey = db.ref().child('data/history').push().key;
+                    currentData.history[newKey] = newHistoryItem;
+                }
+                return currentData;
+            }).catch((err) => {
+                console.error("Transaction Error:", err);
+                alert("データの保存に失敗しました。");
+            });
         }
 
-        // 履歴をそのまま取得する用
-        async function getHistoryRaw() {
-            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-            const res = await fetch(url, { headers: { "Authorization": `token ${GITHUB_TOKEN}` } });
-            const data = await res.json();
-            
-            const base64Content = data.content.replace(/\s/g, '');
-            const binaryString = atob(base64Content);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
+        function deleteHistoryItem(itemKey) {
+            const targetItem = rawHistoryMap[itemKey];
+            if (!targetItem) return;
+
+            autoCreateBackup();
+
+            const pointRefund = -targetItem.points;
+
+            if (currentPoints + pointRefund < 0) {
+                alert("この履歴を削除すると累積ポイントがマイナスになるため、取り消せません。");
+                return;
             }
-            return JSON.parse(new TextDecoder().decode(bytes)).history;
+
+            db.ref("data").transaction((currentData) => {
+                if (currentData) {
+                    currentData.points = currentData.points + pointRefund;
+                    if (currentData.history && currentData.history[itemKey]) {
+                        delete currentData.history[itemKey];
+                    }
+                }
+                return currentData;
+            }).then(() => {
+                alert("指定された履歴を消去し、ポイントを巻き戻しました。");
+            }).catch((err) => {
+                console.error("Delete History Item Error:", err);
+                alert("履歴の消去に失敗しました。");
+            });
         }
 
-        // GitHubにデータを保存（API送信）
-        async function saveToGitHub(newData) {
-            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-            
-            // 日本語文字化け防止用のUTF-8エンコード
-            const jsonString = JSON.stringify(newData, null, 2);
-            const utf8Bytes = new TextEncoder().encode(jsonString);
-            const bodyContent = btoa(String.fromCharCode(...utf8Bytes));
+        // 💾 自動バックアップ作成機能 (最大3つ保持)
+        function autoCreateBackup(isResetting = false) {
+            if (!db) return;
 
-            try {
-                const res = await fetch(url, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${GITHUB_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "Update points via point-shop",
-                        content: bodyContent,
-                        sha: fileSHA
-                    })
+            if (!isResetting && currentPoints === 0 && Object.keys(rawHistoryMap).length <= 1) {
+                return; 
+            }
+
+            return db.ref("data").once("value").then((snapshot) => {
+                const currentVal = snapshot.val();
+                if (!currentVal) return;
+
+                const now = new Date();
+                const labelSuffix = isResetting ? " 初期化直前のデータ" : " 自動保存";
+                const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
+                
+                const backupData = {
+                    timestamp: Date.now(),
+                    label: backupName,
+                    dataState: currentVal
+                };
+
+                return db.ref("backups").push(backupData).then(() => {
+                    // 古いバックアップを削除して、常に最新「3件」に制限
+                    return db.ref("backups").orderByChild("timestamp").once("value", (snap) => {
+                        const backups = [];
+                        snap.forEach((child) => {
+                            backups.push({ key: child.key, ...child.val() });
+                        });
+                        if (backups.length > 3) {
+                            const deleteCount = backups.length - 3;
+                            for (let i = 0; i < deleteCount; i++) {
+                                db.ref("backups/" + backups[i].key).remove();
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        function showBackupListModal() {
+            const listContainer = document.getElementById("backup-list");
+            listContainer.innerHTML = '<div style="text-align: center; padding: 20px 0; font-size: 0.8rem; color: var(--text-muted);">ロード中...</div>';
+
+            db.ref("backups").orderByChild("timestamp").once("value", (snapshot) => {
+                listContainer.innerHTML = "";
+                const backups = [];
+                snapshot.forEach((child) => {
+                    backups.push({ key: child.key, ...child.val() });
                 });
 
-                if (res.ok) {
-                    alert("更新に成功したよ！");
-                    fetchData(); // 画面を再読み込み
-                } else {
-                    throw new Error("APIレスポンスエラー");
+                if (backups.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.8rem;">バックアップデータがありません。</div>';
+                    document.getElementById("backup-modal").style.display = "flex";
+                    return;
                 }
-            } catch (err) {
-                console.error("保存エラー:", err);
-                alert("保存に失敗しちゃった。");
+
+                backups.reverse();
+
+                backups.forEach((bk) => {
+                    const div = document.createElement("div");
+                    div.className = "backup-item";
+
+                    const pts = bk.dataState.points || 0;
+                    
+                    div.innerHTML = `
+                        <div class="backup-info">
+                            <span style="font-weight:600; color:var(--text-color);">${bk.label}</span>
+                            <span style="color:var(--text-muted); font-size:0.65rem;">保有ポイント: ${pts} pt</span>
+                        </div>
+                        <button class="backup-restore-btn" onclick="restoreFromBackup('${bk.key}')">復元</button>
+                    `;
+                    listContainer.appendChild(div);
+                });
+
+                document.getElementById("backup-modal").style.display = "flex";
+            });
+        }
+
+        function restoreFromBackup(backupKey) {
+            if (!confirm("本当にこの時点のデータに復元しますか？\n現在のデータは上書きされます。")) {
+                return;
+            }
+
+            db.ref("backups/" + backupKey).once("value").then((snapshot) => {
+                const backupObj = snapshot.val();
+                if (!backupObj || !backupObj.dataState) {
+                    alert("バックアップの読み込みに失敗しました。");
+                    return;
+                }
+
+                db.ref("data").set(backupObj.dataState)
+                    .then(() => {
+                        alert("バックアップからデータを復旧しました！");
+                        closeBackupModal();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        alert("復元に失敗しました。");
+                    });
+            });
+        }
+
+        function closeBackupModal() {
+            document.getElementById("backup-modal").style.display = "none";
+        }
+
+        // 各種スライダーの連動表示
+        function updateStudyLabel(val) {
+            document.getElementById("study-val-label").innerText = `+${val} pt`;
+        }
+
+        function executeStudy() {
+            const val = parseFloat(document.getElementById("study-range").value);
+            updatePoints(val, `学習（${val}h加算）`);
+            resetSlider("study-range", 1, "study-val-label", "+1 pt");
+        }
+
+        function updateRewardLabel(val) {
+            document.getElementById("reward-val-label").innerText = `-${val} pt`;
+        }
+
+        function executeReward() {
+            const val = parseInt(document.getElementById("reward-range").value, 10);
+            updatePoints(-val, `ご褒美使用 (-${val}pt)`);
+            resetSlider("reward-range", 1, "reward-val-label", "-1 pt");
+        }
+
+        function updateAdjustLabel(val) {
+            document.getElementById("adjust-val-label").innerText = `-${val} pt`;
+        }
+
+        function executeAdjust() {
+            const val = parseFloat(document.getElementById("adjust-range").value);
+            updatePoints(-val, `調整（勉強時間${val}h減）`);
+            resetSlider("adjust-range", 0.5, "adjust-val-label", "-0.5 pt");
+        }
+
+        function resetSlider(sliderId, defaultValue, badgeId, defaultBadgeText) {
+            const slider = document.getElementById(sliderId);
+            if (slider) {
+                slider.value = defaultValue;
+            }
+            const badge = document.getElementById(badgeId);
+            if (badge) {
+                badge.innerText = defaultBadgeText;
+            }
+        }
+
+        function triggerResetFlow() {
+            document.getElementById("confirm-modal").style.display = "flex";
+        }
+
+        function closeConfirmModal() {
+            document.getElementById("confirm-modal").style.display = "none";
+        }
+
+        function openPasswordModal(actionType) {
+            closeConfirmModal();
+            pendingActionType = actionType;
+            document.getElementById("reset-pass-input").value = ""; 
+            
+            const confirmBtn = document.getElementById("pwd-modal-confirm-btn");
+            if (actionType === 'reset') {
+                confirmBtn.onclick = executeReset;
+            } else if (actionType === 'backup') {
+                confirmBtn.onclick = executeOpenBackup;
+            }
+            
+            document.getElementById("password-modal").style.display = "flex";
+        }
+
+        function closePasswordModal() {
+            document.getElementById("password-modal").style.display = "none";
+        }
+
+        function executeOpenBackup() {
+            const resetInputEl = document.getElementById("reset-pass-input");
+            const passInput = resetInputEl.value;
+
+            if (passInput === SECRET_PASSWORD) {
+                closePasswordModal();
+                showBackupListModal();
+            } else {
+                alert("認証エラー：管理者パスワードが一致しません。");
+                resetInputEl.value = "";
+                setTimeout(() => {
+                    resetInputEl.focus();
+                }, 50);
+            }
+        }
+
+        function executeReset() {
+            const resetInputEl = document.getElementById("reset-pass-input");
+            const passInput = resetInputEl.value;
+            
+            if (passInput === SECRET_PASSWORD) {
+                closePasswordModal();
+                
+                autoCreateBackup(true).then(() => {
+                    db.ref("data").remove()
+                        .then(() => {
+                            alert("初期化前に最新バックアップを作成し、データベースをリセットしました。");
+                        })
+                        .catch((error) => {
+                            console.error("Reset Failed:", error);
+                            alert("データベースの消去に失敗しました。");
+                        });
+                }).catch((err) => {
+                    console.error("Backup before reset failed:", err);
+                    alert("事前バックアップに失敗したため、安全を考慮して初期化を中断しました。");
+                });
+            } else {
+                alert("認証エラー：管理者パスワードが一致しません。");
+                resetInputEl.value = "";
+                setTimeout(() => {
+                    resetInputEl.focus();
+                }, 50);
             }
         }
     </script>
