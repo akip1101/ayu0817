@@ -695,7 +695,7 @@
         
         <!-- 👥 ユーザー切り替えタブ -->
         <div class="user-tabs">
-            <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">ayu用</button>
+            <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
             <button id="tab-ayaki" class="tab-btn" onclick="switchUser('ayaki')">あやき用</button>
         </div>
 
@@ -792,7 +792,7 @@
         const SECRET_PASSWORD = "ayu"; 
         const GOAL_HOURS = 45; 
         let db;
-        let currentUser = 'ayu'; // デフォルトで左側の'ayu'を表示
+        let currentUser = 'ayu'; // 内部管理キー（デフォルト起動時に左側のアクティブ状態に紐付け）
         let currentPoints = 0;
         let rawHistoryMap = {}; 
         let pendingActionType = 'reset';
@@ -846,7 +846,7 @@
         }
 
         function startListening() {
-            // パスを data/ayaki または data/ayu に変更
+            // パスは内部キーのまま data/ayaki または data/ayu を利用
             dbListenerRef = db.ref(`data/${currentUser}`);
             dbListenerRef.on("value", (snapshot) => {
                 const content = snapshot.val();
@@ -1059,7 +1059,7 @@
                 if (!currentVal) return;
 
                 const now = new Date();
-                const userName = currentUser === 'ayaki' ? 'あやき' : 'ayu';
+                const userName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
                 const labelSuffix = isResetting ? ` (${userName}初期化直前)` : ` (${userName}自動保存)`;
                 const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
                 
@@ -1197,7 +1197,10 @@
             }
         }
 
+        // 初期化ダイアログ表示時、対象ユーザーを日本語に
         function triggerResetFlow() {
+            const targetName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
+            document.querySelector("#confirm-modal .modal-desc").innerText = `${targetName}のポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。リセット直前に自動バックアップされます。`;
             document.getElementById("confirm-modal").style.display = "flex";
         }
 
@@ -1251,7 +1254,7 @@
                 autoCreateBackup(true).then(() => {
                     db.ref(`data/${currentUser}`).remove()
                         .then(() => {
-                            const targetName = currentUser === 'ayaki' ? 'あやき' : 'ayu';
+                            const targetName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
                             alert(`初期化前に${targetName}の最新バックアップを作成し、データをリセットしました。`);
                         })
                         .catch((error) => {
