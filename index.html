@@ -43,7 +43,7 @@
         .container {
             width: 90%;
             max-width: 400px;
-            margin: 80px auto;
+            margin: 40px auto 80px auto; /* 上部マージンを調整 */
         }
 
         /* 🔒 映画のワンシーンのような美しいロック画面 */
@@ -107,7 +107,42 @@
             box-shadow: 0 15px 25px rgba(0,0,0,0.1);
         }
 
-        /* 📊 統計表示エリア (美しく整列したグラスモフィズム) */
+        /* 👥 極上ミニマル・切り替えタブ */
+        .user-tabs {
+            display: flex;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 6px;
+            border: var(--glass-border);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-btn.active {
+            background: var(--text-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 📊 統計表示エリア */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -251,7 +286,7 @@
             transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 💡 操作中（スライダーを動かしているとき）にバッジを少しだけ際立たせる */
+        /* スライダー操作時にバッジを際立たせる */
         .slider:active ~ .slider-header .val-badge,
         .control-box:focus-within .val-badge {
             transform: scale(1.1);
@@ -272,7 +307,7 @@
             background: rgba(0, 0, 0, 0.04);
         }
 
-        /* 🎛️ スライダーの極上デザイン化 */
+        /* 🎛️ スライダー */
         .slider {
             -webkit-appearance: none;
             width: 100%;
@@ -302,7 +337,7 @@
             box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         }
 
-        /* 🔘 プレミアム実行ボタン */
+        /* 🔘 実行ボタン */
         .btn-execute {
             background-color: var(--text-color);
             color: white;
@@ -419,7 +454,7 @@
             transform: scale(1.15);
         }
 
-        /* ⚠️ 危険・管理ゾーン (ノイズ感を徹底排除) */
+        /* ⚠️ セーフティ領域 */
         .danger-zone {
             display: flex;
             flex-direction: column;
@@ -471,7 +506,7 @@
             border-color: rgba(231, 76, 60, 0.2);
         }
 
-        /* 💬 グラスモフィズム・ダイアログ/モーダル */
+        /* 💬 ダイアログ/モーダル */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -618,7 +653,7 @@
     <div id="confirm-modal" class="modal-overlay">
         <div class="modal-card">
             <h3 class="modal-title">システム初期化</h3>
-            <p class="modal-desc">現在のポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。データはリセット直前にバックアップへ自動保存されます。</p>
+            <p class="modal-desc">選択中のユーザーのポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。リセット直前に自動バックアップされます。</p>
             <div class="modal-btn-row">
                 <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">キャンセル</button>
                 <button class="modal-btn modal-btn-confirm" onclick="openPasswordModal('reset')">初期化を実行</button>
@@ -643,7 +678,7 @@
     <div id="backup-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 360px;">
             <h3 class="modal-title">バックアップ管理</h3>
-            <p class="modal-desc">安全に自動退避された直近3つまでの履歴データから選択して復元します。</p>
+            <p class="modal-desc">選択中ユーザーの、自動退避された直近3つまでの履歴データから選択して復元します。</p>
             
             <div class="backup-list-container" id="backup-list">
                 <div style="text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.8rem;">バックアップはありません</div>
@@ -657,7 +692,14 @@
 
     <!-- メインコンテンツ -->
     <div class="container">
-        <!-- 統計表示 -->
+        
+        <!-- 👥 ユーザー切り替えタブ -->
+        <div class="user-tabs">
+            <button id="tab-ayaki" class="tab-btn active" onclick="switchUser('ayaki')">自分用</button>
+            <button id="tab-ayu" class="tab-btn" onclick="switchUser('ayu')">ayu用</button>
+        </div>
+
+        <!-- 📊 統計表示 -->
         <div class="stats-grid">
             <div class="point-box">
                 <div class="point-title">Balance</div>
@@ -706,7 +748,6 @@
                     <span id="reward-val-label" class="val-badge val-badge-reward">-1 pt</span>
                 </div>
                 <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="updateRewardLabel(this.value)">
-                <!-- 💡 実行ボタンの背景色をアッシュグレー（var(--text-muted)）に統一しました -->
                 <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeReward()">選択したポイントで使用する</button>
             </div>
 
@@ -751,9 +792,11 @@
         const SECRET_PASSWORD = "ayu"; 
         const GOAL_HOURS = 45; 
         let db;
+        let currentUser = 'ayaki'; // 'ayaki' or 'ayu'
         let currentPoints = 0;
         let rawHistoryMap = {}; 
         let pendingActionType = 'reset';
+        let dbListenerRef = null;
 
         // パスワードチェック (ロック解除)
         function checkPassword() {
@@ -786,8 +829,26 @@
             }
         });
 
+        // 👥 ユーザー切り替え処理
+        function switchUser(userKey) {
+            if (currentUser === userKey) return;
+            currentUser = userKey;
+
+            // タブのCSS切り替え
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${userKey}`).classList.add('active');
+
+            // Firebaseのリスナーを一度削除して、新しいパスで再接続
+            if (dbListenerRef) {
+                dbListenerRef.off();
+            }
+            startListening();
+        }
+
         function startListening() {
-            db.ref("data").on("value", (snapshot) => {
+            // パスを data/ayaki または data/ayu に変更
+            dbListenerRef = db.ref(`data/${currentUser}`);
+            dbListenerRef.on("value", (snapshot) => {
                 const content = snapshot.val();
                 
                 if (content) {
@@ -801,7 +862,7 @@
                             "init": { date: new Date().toLocaleDateString('ja-JP'), action: "初期登録", points: 0, timestamp: Date.now() }
                         }
                     };
-                    db.ref("data").set(initialData);
+                    db.ref(`data/${currentUser}`).set(initialData);
                 }
             }, (error) => {
                 console.error("Firebase Read Error:", error);
@@ -940,13 +1001,13 @@
                 points: amount
             };
 
-            db.ref("data").transaction((currentData) => {
+            db.ref(`data/${currentUser}`).transaction((currentData) => {
                 if (currentData) {
                     currentData.points = newPoints;
                     if (!currentData.history) {
                         currentData.history = {};
                     }
-                    const newKey = db.ref().child('data/history').push().key;
+                    const newKey = db.ref().child(`data/${currentUser}/history`).push().key;
                     currentData.history[newKey] = newHistoryItem;
                 }
                 return currentData;
@@ -969,7 +1030,7 @@
                 return;
             }
 
-            db.ref("data").transaction((currentData) => {
+            db.ref(`data/${currentUser}`).transaction((currentData) => {
                 if (currentData) {
                     currentData.points = currentData.points + pointRefund;
                     if (currentData.history && currentData.history[itemKey]) {
@@ -985,7 +1046,7 @@
             });
         }
 
-        // 💾 自動バックアップ作成機能 (最大3つ保持)
+        // 💾 自動バックアップ作成機能 (ユーザー個別に最大3つ保持)
         function autoCreateBackup(isResetting = false) {
             if (!db) return;
 
@@ -993,23 +1054,25 @@
                 return; 
             }
 
-            return db.ref("data").once("value").then((snapshot) => {
+            return db.ref(`data/${currentUser}`).once("value").then((snapshot) => {
                 const currentVal = snapshot.val();
                 if (!currentVal) return;
 
                 const now = new Date();
-                const labelSuffix = isResetting ? " 初期化直前のデータ" : " 自動保存";
+                const userName = currentUser === 'ayaki' ? '自分' : 'ayu';
+                const labelSuffix = isResetting ? ` (${userName}初期化直前)` : ` (${userName}自動保存)`;
                 const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
                 
                 const backupData = {
                     timestamp: Date.now(),
                     label: backupName,
+                    user: currentUser,
                     dataState: currentVal
                 };
 
-                return db.ref("backups").push(backupData).then(() => {
-                    // 古いバックアップを削除して、常に最新「3件」に制限
-                    return db.ref("backups").orderByChild("timestamp").once("value", (snap) => {
+                return db.ref(`backups/${currentUser}`).push(backupData).then(() => {
+                    // 古いバックアップを削除して、ユーザーごとに常に最新「3件」に制限
+                    return db.ref(`backups/${currentUser}`).orderByChild("timestamp").once("value", (snap) => {
                         const backups = [];
                         snap.forEach((child) => {
                             backups.push({ key: child.key, ...child.val() });
@@ -1017,7 +1080,7 @@
                         if (backups.length > 3) {
                             const deleteCount = backups.length - 3;
                             for (let i = 0; i < deleteCount; i++) {
-                                db.ref("backups/" + backups[i].key).remove();
+                                db.ref(`backups/${currentUser}/${backups[i].key}`).remove();
                             }
                         }
                     });
@@ -1029,7 +1092,7 @@
             const listContainer = document.getElementById("backup-list");
             listContainer.innerHTML = '<div style="text-align: center; padding: 20px 0; font-size: 0.8rem; color: var(--text-muted);">ロード中...</div>';
 
-            db.ref("backups").orderByChild("timestamp").once("value", (snapshot) => {
+            db.ref(`backups/${currentUser}`).orderByChild("timestamp").once("value", (snapshot) => {
                 listContainer.innerHTML = "";
                 const backups = [];
                 snapshot.forEach((child) => {
@@ -1069,14 +1132,14 @@
                 return;
             }
 
-            db.ref("backups/" + backupKey).once("value").then((snapshot) => {
+            db.ref(`backups/${currentUser}/${backupKey}`).once("value").then((snapshot) => {
                 const backupObj = snapshot.val();
                 if (!backupObj || !backupObj.dataState) {
                     alert("バックアップの読み込みに失敗しました。");
                     return;
                 }
 
-                db.ref("data").set(backupObj.dataState)
+                db.ref(`data/${currentUser}`).set(backupObj.dataState)
                     .then(() => {
                         alert("バックアップからデータを復旧しました！");
                         closeBackupModal();
@@ -1185,9 +1248,10 @@
                 closePasswordModal();
                 
                 autoCreateBackup(true).then(() => {
-                    db.ref("data").remove()
+                    db.ref(`data/${currentUser}`).remove()
                         .then(() => {
-                            alert("初期化前に最新バックアップを作成し、データベースをリセットしました。");
+                            const targetName = currentUser === 'ayaki' ? '自分' : 'ayu';
+                            alert(`初期化前に${targetName}の最新バックアップを作成し、データをリセットしました。`);
                         })
                         .catch((error) => {
                             console.error("Reset Failed:", error);
