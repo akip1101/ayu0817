@@ -695,8 +695,8 @@
         
         <!-- 👥 ユーザー切り替えタブ -->
         <div class="user-tabs">
-            <button id="tab-ayaki" class="tab-btn active" onclick="switchUser('ayaki')">自分用</button>
-            <button id="tab-ayu" class="tab-btn" onclick="switchUser('ayu')">ayu用</button>
+            <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">ayu用</button>
+            <button id="tab-ayaki" class="tab-btn" onclick="switchUser('ayaki')">あやき用</button>
         </div>
 
         <!-- 📊 統計表示 -->
@@ -792,7 +792,7 @@
         const SECRET_PASSWORD = "ayu"; 
         const GOAL_HOURS = 45; 
         let db;
-        let currentUser = 'ayaki'; // 'ayaki' or 'ayu'
+        let currentUser = 'ayu'; // デフォルトで左側の'ayu'を表示
         let currentPoints = 0;
         let rawHistoryMap = {}; 
         let pendingActionType = 'reset';
@@ -1059,7 +1059,7 @@
                 if (!currentVal) return;
 
                 const now = new Date();
-                const userName = currentUser === 'ayaki' ? '自分' : 'ayu';
+                const userName = currentUser === 'ayaki' ? 'あやき' : 'ayu';
                 const labelSuffix = isResetting ? ` (${userName}初期化直前)` : ` (${userName}自動保存)`;
                 const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
                 
@@ -1205,6 +1205,7 @@
             document.getElementById("confirm-modal").style.display = "none";
         }
 
+        // モーダルを開く処理
         function openPasswordModal(actionType) {
             closeConfirmModal();
             pendingActionType = actionType;
@@ -1250,7 +1251,7 @@
                 autoCreateBackup(true).then(() => {
                     db.ref(`data/${currentUser}`).remove()
                         .then(() => {
-                            const targetName = currentUser === 'ayaki' ? '自分' : 'ayu';
+                            const targetName = currentUser === 'ayaki' ? 'あやき' : 'ayu';
                             alert(`初期化前に${targetName}の最新バックアップを作成し、データをリセットしました。`);
                         })
                         .catch((error) => {
