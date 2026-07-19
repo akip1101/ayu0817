@@ -20,7 +20,7 @@
             --text-color: #5a4b4e;
             --text-muted: #a68a90;
             --card-bg: #ffffff;
-            --border-radius: 20px;
+            --border-radius: 24px;
             --font-main: 'M PLUS Rounded 1c', sans-serif;
             --font-eng: 'Fredoka', sans-serif;
         }
@@ -41,7 +41,6 @@
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* ログイン画面の背景画像を設定 */
             background-image: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
             background-size: cover;
             background-position: center;
@@ -53,40 +52,55 @@
             z-index: 2000;
             transition: opacity 0.5s ease;
         }
-        /* 背景画像の上に白っぽいフィルターを重ねて見やすくする */
+        /* ふんわりとした可愛いピンクホワイトのフィルター */
         #lock-screen::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 238, 242, 0.85); /* ピンクがかった白 */
+            background-color: rgba(255, 242, 245, 0.82);
             z-index: -1;
         }
 
-        .lock-illustration {
-            width: 140px; height: 140px;
-            background: #ffffff; border-radius: 50%;
-            margin-bottom: 20px; border: 4px solid #ffffff;
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 8px 20px rgba(255, 143, 169, 0.2);
+        .lock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 35px 40px;
+            border-radius: 32px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 12px 32px rgba(255, 143, 169, 0.15);
+            backdrop-filter: blur(4px);
         }
-        .lock-illustration span { font-size: 4rem; }
+
         #lock-screen h2 {
-            font-size: 1.2rem; font-family: var(--font-eng);
-            color: var(--dark-pink); margin-bottom: 20px;
+            font-size: 1.4rem; font-family: var(--font-eng);
+            color: var(--dark-pink); margin: 0 0 20px 0;
+            letter-spacing: 2px;
         }
         #lock-screen input {
-            background: #ffffff; border: 2px solid var(--soft-pink);
-            border-radius: 24px; padding: 12px; font-size: 1.2rem;
-            width: 200px; text-align: center; outline: none; margin-bottom: 20px;
-            color: var(--text-color);
+            background: #ffffff; border: 2.5px solid var(--soft-pink);
+            border-radius: 30px; padding: 14px; font-size: 1.2rem;
+            width: 220px; text-align: center; outline: none; margin-bottom: 20px;
+            color: var(--text-color); font-family: var(--font-eng);
+            box-shadow: inset 0 2px 4px rgba(255, 143, 169, 0.05);
+            transition: border-color 0.2s;
+        }
+        #lock-screen input:focus {
+            border-color: var(--main-pink);
         }
         #lock-screen button {
             background-color: var(--main-pink); color: white; border: none;
-            padding: 12px 50px; border-radius: 24px; font-size: 0.9rem;
-            cursor: pointer; font-weight: 700;
+            padding: 14px 60px; border-radius: 30px; font-size: 1rem;
+            cursor: pointer; font-weight: 700; font-family: var(--font-eng);
+            box-shadow: 0 6px 14px rgba(255, 143, 169, 0.3);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        #lock-screen button:active {
+            transform: scale(0.98);
         }
 
-        /* 🎀 ナビゲーション (アイコン画像化と日本語化) */
+        /* 🎀 ナビゲーション */
         .sidebar {
             width: 110px; background-color: #fffbfa; border-right: 3px solid var(--soft-pink);
             display: flex; flex-direction: column; align-items: center; padding-top: 20px;
@@ -103,44 +117,48 @@
         }
         .nav-item.active, .nav-item:hover {
             color: var(--dark-pink); background-color: #ffeef2;
-            border-radius: 12px; width: calc(100% - 16px); margin: 0 8px;
+            border-radius: 16px; width: calc(100% - 16px); margin: 0 8px;
         }
-        /* アイコン画像を丸く表示 */
         .nav-icon-img {
-            width: 50px; height: 50px;
+            width: 52px; height: 52px;
             border-radius: 50%;
-            border: 2px solid var(--soft-pink);
+            border: 2.5px solid var(--soft-pink);
             object-fit: cover;
             background-color: white;
+            transition: transform 0.2s;
+        }
+        .nav-item:hover .nav-icon-img {
+            transform: scale(1.05);
         }
         .bottom-nav { display: none; }
 
         /* 🏠 メインレイアウト */
         .main-wrapper {
             margin-left: 110px; flex: 1; display: flex; flex-direction: column;
-            padding: 20px; box-sizing: border-box; width: calc(100% - 110px);
+            padding: 25px; box-sizing: border-box; width: calc(100% - 110px);
         }
 
         /* 👑 ヘッダーエリア */
-        .header-section { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .header-section { text-align: center; margin-bottom: 25px; }
 
         /* 👥 ユーザー切り替えタブ */
         .user-tabs {
             display: flex; background: #ffffff; border-radius: 24px;
-            padding: 4px; border: 2px solid var(--soft-pink); margin: 0 auto; max-width: 300px;
+            padding: 5px; border: 2.5px solid var(--soft-pink); margin: 0 auto; max-width: 300px;
+            box-shadow: 0 4px 10px rgba(255, 143, 169, 0.03);
         }
         .tab-btn {
             flex: 1; background: transparent; border: none; padding: 10px;
             border-radius: 20px; font-size: 0.85rem; color: var(--text-muted);
             cursor: pointer; font-weight: 700; transition: all 0.2s;
         }
-        .tab-btn.active { background: var(--main-pink); color: white; }
+        .tab-btn.active { background: var(--main-pink); color: white; box-shadow: 0 4px 10px rgba(255, 143, 169, 0.2); }
 
         /* 📦 画面切り替え管理 */
         .view-content { display: none; }
         .view-content.active { display: block; }
 
-        /* 📊 ダッシュボードグリッド（3カラム構成） */
+        /* 📊 ダッシュボードグリッド */
         .dashboard-grid {
             display: grid; grid-template-columns: 300px 1fr 300px; gap: 20px; align-items: start;
         }
@@ -148,49 +166,54 @@
         /* 📝 ノート・カード基盤 */
         .notebook-card {
             background-color: var(--card-bg); border: 3px solid var(--soft-pink);
-            border-radius: var(--border-radius); padding: 20px;
-            box-shadow: 0 6px 12px rgba(255, 143, 169, 0.05); margin-bottom: 20px;
+            border-radius: var(--border-radius); padding: 22px;
+            box-shadow: 0 8px 16px rgba(255, 143, 169, 0.04); margin-bottom: 20px;
             position: relative;
         }
-        .card-title { font-family: var(--font-eng); font-size: 1.1rem; color: var(--dark-pink); margin: 0 0 5px 0; text-align: center; }
-        .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 15px; }
+        .card-title { font-family: var(--font-main); font-size: 1.15rem; color: var(--dark-pink); margin: 0 0 6px 0; text-align: center; }
+        .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 18px; }
 
         /* コンテナ系 */
-        .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 12px; border-radius: 16px; }
-        .point-val { font-size: 2.3rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; }
-        .study-time-val { font-size: 1.1rem; color: var(--text-color); margin: 0; }
+        .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 14px; border-radius: 18px; }
+        .point-val { font-size: 2.4rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; }
+        .study-time-val { font-size: 1.15rem; color: var(--text-color); margin: 0; }
 
         /* 進捗バー */
-        .progress-bar-bg { background: #ffe3e9; height: 12px; border-radius: 6px; width: 100%; overflow: hidden; margin-top: 5px; }
-        .progress-bar-fill { background: linear-gradient(90deg, #ff9ebb, var(--main-pink)); height: 100%; width: 0%; border-radius: 6px; transition: width 0.5s ease; }
+        .progress-bar-bg { background: #ffe3e9; height: 14px; border-radius: 7px; width: 100%; overflow: hidden; margin-top: 6px; }
+        .progress-bar-fill { background: linear-gradient(90deg, #ff9ebb, var(--main-pink)); height: 100%; width: 0%; border-radius: 7px; transition: width 0.5s ease; }
 
         /* 入力フォーム・コントロール */
-        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        label { font-size: 0.85rem; color: var(--text-color); }
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+        label { font-size: 0.85rem; color: var(--text-color); margin-left: 4px; }
         input[type="text"], input[type="number"], select {
-            width: 100%; padding: 10px; border: 2px solid var(--soft-pink); border-radius: 12px;
+            width: 100%; padding: 11px 14px; border: 2.5px solid var(--soft-pink); border-radius: 14px;
             font-family: var(--font-main); font-size: 0.9rem; color: var(--text-color); box-sizing: border-box; outline: none;
+            transition: border-color 0.2s;
         }
-        .slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #fff; outline: none; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--main-pink); border: 2px solid #fff; cursor: pointer; }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--main-pink); }
+        
+        .slider { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: #fff; outline: none; border: 2px solid var(--soft-pink); }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--main-pink); border: 2.5px solid #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 143, 169, 0.2); }
 
         .btn-execute {
-            width: 100%; background-color: var(--main-pink); color: white; padding: 12px;
-            border-radius: 14px; border: none; font-size: 0.9rem; cursor: pointer; font-weight: 700;
+            width: 100%; background-color: var(--main-pink); color: white; padding: 13px;
+            border-radius: 16px; border: none; font-size: 0.95rem; cursor: pointer; font-weight: 700;
+            box-shadow: 0 4px 10px rgba(255, 143, 169, 0.2); transition: background-color 0.2s, transform 0.1s;
         }
         .btn-execute:hover { background-color: var(--dark-pink); }
+        .btn-execute:active { transform: scale(0.99); }
 
         /* リスト・アイテム表示 */
         .item-list { list-style: none; padding: 0; margin: 0; }
         .list-entry {
-            background: var(--bg-color); padding: 15px; border-radius: 14px;
+            background: var(--bg-color); padding: 15px; border-radius: 16px;
             margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
         .entry-info { display: flex; flex-direction: column; gap: 4px; }
         .entry-title { font-size: 0.95rem; color: var(--text-color); }
         .entry-meta { font-size: 0.75rem; color: var(--text-muted); }
         
-        .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
+        .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.5; transition: opacity 0.2s; }
         .btn-action:hover { opacity: 1; }
 
         /* ⚙️ 下部管理セクション */
@@ -209,24 +232,23 @@
             .bottom-nav .nav-item { padding: 0; flex: 1; height: 100%; }
             .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 90px 15px; }
             .dashboard-grid { grid-template-columns: 1fr; gap: 15px; }
-            .nav-icon-img { width: 45px; height: 45px; }
+            .nav-icon-img { width: 46px; height: 46px; }
             .nav-item.active, .nav-item:hover { border-radius: 0; width: 100%; margin: 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ロック画面 (背景と絵文字を修正) -->
+    <!-- ロック画面 (絵文字をなくして可愛くコンテナ化) -->
     <div id="lock-screen">
-        <div class="lock-illustration">
-            <span>🍀</span>
+        <div class="lock-container">
+            <h2>ENTER PASSWORD</h2>
+            <input type="password" id="pass-input">
+            <button onclick="checkPassword()">Open</button>
         </div>
-        <h2>ENTER PASSWORD</h2>
-        <input type="password" id="pass-input">
-        <button onclick="checkPassword()">Open</button>
     </div>
 
-    <!-- 🎀 PC用サイドメニュー (アイコンと文字を修正) -->
+    <!-- 🎀 PC用サイドメニュー -->
     <aside class="sidebar">
         <div class="sidebar-menu">
             <button class="nav-item active" onclick="switchView('dashboard')">
@@ -244,7 +266,7 @@
         </div>
     </aside>
 
-    <!-- 📱 スマホ用ボトムメニュー (アイコンと文字を修正) -->
+    <!-- 📱 スマホ用ボトムメニュー -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchView('dashboard')">
             <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png" alt="ダッシュボード">
@@ -271,7 +293,7 @@
             </div>
         </header>
 
-        <!-- 🏠 ① ダッシュボード画面 (テキストを日本語化) -->
+        <!-- 🏠 ① ダッシュボード画面 -->
         <div id="view-dashboard" class="view-content active">
             <div class="dashboard-grid">
                 
@@ -331,16 +353,16 @@
             </div>
         </div>
 
-        <!-- 🎁 ② ご褒美ストア画面 (テキストを日本語化) -->
+        <!-- 🎁 ② ご褒美ストア画面 -->
         <div id="view-rewards" class="view-content">
             <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
-                <!-- 左側: ご褒美追加 -->
+                <!-- 左側: ご褒美追加 (具体例を削除) -->
                 <section class="notebook-card">
                     <h3 class="card-title">ご褒美作成</h3>
                     <p class="card-subtitle">新しいご褒美をつくる</p>
                     <div class="form-group">
                         <label>ご褒美の名前:</label>
-                        <input type="text" id="reward-name" placeholder="例: スマホゲーム30分">
+                        <input type="text" id="reward-name">
                     </div>
                     <div class="form-group">
                         <label>ひつようなポイント:</label>
@@ -357,7 +379,7 @@
             </div>
         </div>
 
-        <!-- 📊 ③ 目償設定画面 (目標設定に修正) -->
+        <!-- 📊 ③ 目標設定画面 -->
         <div id="view-goals" class="view-content">
             <section class="notebook-card" style="max-width: 500px; margin: 0 auto;">
                 <h3 class="card-title">目標設定</h3>
@@ -370,7 +392,7 @@
             </section>
         </div>
 
-        <!-- ⚙️ バックアップ等管理 (テキストを日本語化) -->
+        <!-- ⚙️ バックアップ等管理 -->
         <footer class="danger-zone">
             <button class="btn-sub" onclick="alert('データ連携完了後に自動保存されます')">データ同期</button>
             <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">全データの初期化</button>
@@ -379,7 +401,6 @@
     </main>
 
     <script>
-        // Firebase構成設定
         const firebaseConfig = {
             apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
             authDomain: "gohoubipt.firebaseapp.com",
@@ -416,7 +437,6 @@
             document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${viewName}`).classList.add('active');
             
-            // PCメニューとスマホメニューの両方を更新
             document.querySelectorAll('.nav-item').forEach(btn => {
                 if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active');
                 else btn.classList.remove('active');
@@ -439,7 +459,6 @@
                 currentPoints = data.points || 0;
                 currentGoal = data.goalHours || 45;
 
-                // 各画面のポイント・目標表示を更新
                 const pointsElems = ['dash-points', 'shop-points'];
                 pointsElems.forEach(id => {
                     const elem = document.getElementById(id);
