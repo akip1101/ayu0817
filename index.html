@@ -2,278 +2,127 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Study Dashboard</title>
-    <!-- Google Fonts: 丸みのある可愛い日本語・英語フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #fff0f3;
-            --main-pink: #ff8fa9;
-            --dark-pink: #ff6b8b;
-            --soft-pink: #ffe3e9;
-            --text-color: #5a4b4e;
-            --text-muted: #a68a90;
-            --card-bg: #ffffff;
-            --border-radius: 24px;
-            --font-main: 'M PLUS Rounded 1c', sans-serif;
-            --font-eng: 'Fredoka', sans-serif;
+            --bg-color: #fff0f3; --main-pink: #ff8fa9; --dark-pink: #ff6b8b; --soft-pink: #ffe3e9;
+            --text-color: #5a4b4e; --text-muted: #a68a90; --card-bg: #ffffff; --border-radius: 24px;
+            --font-main: 'M PLUS Rounded 1c', sans-serif; --font-eng: 'Fredoka', sans-serif;
+            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
+            --filter-color: rgba(255, 240, 243, 0.75);
+        }
+
+        body.dark-mode {
+            --bg-color: #2a1f26; --main-pink: #c96788; --dark-pink: #e07b9e; --soft-pink: #44323c;
+            --text-color: #fce4e8; --text-muted: #b898a1; --card-bg: #362831;
+            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png');
+            --filter-color: rgba(42, 31, 38, 0.85);
         }
 
         body {
-            font-family: var(--font-main);
-            font-weight: 700;
-            background-color: var(--bg-color);
-            /* 🎀 マイメロディの画像を小さくタイル状に敷き詰める */
-            background-image: linear-gradient(rgba(255, 240, 243, 0.75), rgba(255, 240, 243, 0.75)), url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
-            background-size: 110px; /* 画像のサイズを小さくする */
-            background-repeat: repeat; /* 繰り返し並べる */
-            background-attachment: fixed; /* スクロールしても背景を固定する */
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            display: flex;
-            min-height: 100vh;
+            font-family: var(--font-main); font-weight: 700; background-color: var(--bg-color);
+            background-image: linear-gradient(var(--filter-color), var(--filter-color)), var(--bg-img);
+            background-size: 110px; background-repeat: repeat; background-attachment: fixed; color: var(--text-color);
+            margin: 0; padding: 0; box-sizing: border-box; display: flex; min-height: 100vh; transition: all 0.3s ease;
         }
 
-        /* 🔒 ロック画面（ログイン画面） */
         #lock-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255, 242, 245, 0.82), rgba(255, 242, 245, 0.82)), url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            transition: opacity 0.5s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--filter-color), var(--filter-color)), var(--bg-img);
+            background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s ease;
         }
+        .lock-container { display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 35px 40px; border-radius: 32px; border: 3px solid var(--soft-pink); box-shadow: 0 12px 32px rgba(0,0,0,0.15); backdrop-filter: blur(4px); }
+        #lock-screen h2 { font-size: 1.4rem; font-family: var(--font-eng); color: var(--dark-pink); margin: 0 0 20px 0; letter-spacing: 2px; }
+        #lock-screen input { background: var(--bg-color); border: 2.5px solid var(--soft-pink); border-radius: 30px; padding: 14px; font-size: 1.2rem; width: 220px; text-align: center; outline: none; margin-bottom: 20px; color: var(--text-color); font-family: var(--font-eng); }
+        #lock-screen button { background-color: var(--main-pink); color: white; border: none; padding: 14px 60px; border-radius: 30px; font-size: 1rem; cursor: pointer; font-weight: 700; }
 
-        .lock-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 35px 40px;
-            border-radius: 32px;
-            border: 3px solid #ffffff;
-            box-shadow: 0 12px 32px rgba(255, 143, 169, 0.15);
-            backdrop-filter: blur(4px);
-        }
-
-        #lock-screen h2 {
-            font-size: 1.4rem; font-family: var(--font-eng);
-            color: var(--dark-pink); margin: 0 0 20px 0;
-            letter-spacing: 2px;
-        }
-        #lock-screen input {
-            background: #ffffff; border: 2.5px solid var(--soft-pink);
-            border-radius: 30px; padding: 14px; font-size: 1.2rem;
-            width: 220px; text-align: center; outline: none; margin-bottom: 20px;
-            color: var(--text-color); font-family: var(--font-eng);
-            box-shadow: inset 0 2px 4px rgba(255, 143, 169, 0.05);
-            transition: border-color 0.2s;
-        }
-        #lock-screen input:focus { border-color: var(--main-pink); }
-        #lock-screen button {
-            background-color: var(--main-pink); color: white; border: none;
-            padding: 14px 60px; border-radius: 30px; font-size: 1rem;
-            cursor: pointer; font-weight: 700; font-family: var(--font-eng);
-            box-shadow: 0 6px 14px rgba(255, 143, 169, 0.3);
-            transition: transform 0.1s, background-color 0.2s;
-        }
-        #lock-screen button:active { transform: scale(0.98); }
-
-        /* 🎀 ナビゲーション */
-        .sidebar {
-            width: 110px; background-color: rgba(255, 251, 250, 0.95); border-right: 3px solid var(--soft-pink);
-            display: flex; flex-direction: column; align-items: center; padding-top: 20px;
-            position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
-            backdrop-filter: blur(5px);
-        }
+        .sidebar { width: 110px; background-color: var(--card-bg); border-right: 3px solid var(--soft-pink); display: flex; flex-direction: column; align-items: center; padding-top: 20px; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; opacity: 0.95; }
         .sidebar-menu { display: flex; flex-direction: column; gap: 15px; width: 100%; margin-top: 20px; }
-        
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            background: transparent; border: none; cursor: pointer;
-            color: var(--text-muted); font-size: 0.75rem; font-weight: 700; gap: 8px; padding: 15px 0;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        .nav-item.active, .nav-item:hover {
-            color: var(--dark-pink); background-color: rgba(255, 238, 242, 0.8);
-            border-radius: 16px; width: calc(100% - 16px); margin: 0 8px;
-        }
-        .nav-icon-img {
-            width: 52px; height: 52px;
-            border-radius: 50%;
-            border: 2.5px solid var(--soft-pink);
-            object-fit: cover;
-            background-color: white;
-            transition: transform 0.2s;
-        }
-        .nav-item:hover .nav-icon-img { transform: scale(1.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; background: transparent; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; gap: 8px; padding: 15px 0; transition: all 0.2s; width: 100%; }
+        .nav-item.active, .nav-item:hover { color: var(--dark-pink); background-color: var(--soft-pink); border-radius: 16px; width: calc(100% - 16px); margin: 0 8px; }
+        .nav-icon-img { width: 52px; height: 52px; border-radius: 50%; border: 2.5px solid var(--soft-pink); object-fit: cover; background-color: white; }
         .bottom-nav { display: none; }
 
-        /* 🏠 メインレイアウト */
-        .main-wrapper {
-            margin-left: 110px; flex: 1; display: flex; flex-direction: column;
-            padding: 25px; box-sizing: border-box; width: calc(100% - 110px);
-        }
-
+        .main-wrapper { margin-left: 110px; flex: 1; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; width: calc(100% - 110px); }
         .header-section { text-align: center; margin-bottom: 25px; }
-
-        .user-tabs {
-            display: flex; background: rgba(255, 255, 255, 0.9); border-radius: 24px;
-            padding: 5px; border: 2.5px solid var(--soft-pink); margin: 0 auto; max-width: 300px;
-            box-shadow: 0 4px 10px rgba(255, 143, 169, 0.03);
-            backdrop-filter: blur(5px);
-        }
-        .tab-btn {
-            flex: 1; background: transparent; border: none; padding: 10px;
-            border-radius: 20px; font-size: 0.85rem; color: var(--text-muted);
-            cursor: pointer; font-weight: 700; transition: all 0.2s;
-        }
-        .tab-btn.active { background: var(--main-pink); color: white; box-shadow: 0 4px 10px rgba(255, 143, 169, 0.2); }
+        .user-tabs { display: flex; background: var(--card-bg); border-radius: 24px; padding: 5px; border: 2.5px solid var(--soft-pink); margin: 0 auto; max-width: 300px; }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 10px; border-radius: 20px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; font-weight: 700; transition: all 0.2s; }
+        .tab-btn.active { background: var(--main-pink); color: white; }
 
         .view-content { display: none; }
         .view-content.active { display: block; }
+        
+        .mobile-container { max-width: 600px; margin: 0 auto; width: 100%; }
 
-        .dashboard-grid {
-            display: grid; grid-template-columns: 300px 1fr 340px; gap: 20px; align-items: start;
-        }
-
-        .notebook-card {
-            background-color: rgba(255, 255, 255, 0.92); border: 3px solid var(--soft-pink);
-            border-radius: var(--border-radius); padding: 22px;
-            box-shadow: 0 8px 16px rgba(255, 143, 169, 0.08); margin-bottom: 20px;
-            position: relative;
-            backdrop-filter: blur(5px);
-        }
+        .notebook-card { background-color: var(--card-bg); border: 3px solid var(--soft-pink); border-radius: var(--border-radius); padding: 22px; margin-bottom: 20px; }
         .card-title { font-family: var(--font-main); font-size: 1.15rem; color: var(--dark-pink); margin: 0 0 6px 0; text-align: center; }
         .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 18px; }
 
-        .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 14px; border-radius: 18px; }
-        .point-val { font-size: 2.4rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; }
-        .study-time-val { font-size: 1.15rem; color: var(--text-color); margin: 0; }
-
-        .progress-bar-bg { background: #ffe3e9; height: 14px; border-radius: 7px; width: 100%; overflow: hidden; margin-top: 6px; }
+        .timer-display { font-size: 3.5rem; text-align: center; color: var(--dark-pink); font-family: var(--font-eng); margin: 15px 0; letter-spacing: 2px; }
+        .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 14px; border-radius: 18px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+        .point-val { font-size: 2.2rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; line-height: 1.2;}
+        .progress-bar-bg { background: var(--soft-pink); height: 14px; border-radius: 7px; width: 100%; overflow: hidden; margin-top: 6px; }
         .progress-bar-fill { background: linear-gradient(90deg, #ff9ebb, var(--main-pink)); height: 100%; width: 0%; border-radius: 7px; transition: width 0.5s ease; }
 
         .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
         label { font-size: 0.85rem; color: var(--text-color); margin-left: 4px; }
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 11px 14px; border: 2.5px solid var(--soft-pink); border-radius: 14px;
-            font-family: var(--font-main); font-size: 0.9rem; color: var(--text-color); box-sizing: border-box; outline: none;
-            transition: border-color 0.2s;
-            background-color: #ffffff;
-        }
-        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--main-pink); }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 12px 14px; border: 2.5px solid var(--soft-pink); border-radius: 14px; font-family: var(--font-main); font-size: 1rem; color: var(--text-color); background-color: var(--bg-color); box-sizing: border-box; outline: none; }
         
-        .slider { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: #fff; outline: none; border: 2px solid var(--soft-pink); }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--main-pink); border: 2.5px solid #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 143, 169, 0.2); }
-
-        .btn-execute {
-            width: 100%; background-color: var(--main-pink); color: white; padding: 13px;
-            border-radius: 16px; border: none; font-size: 0.95rem; cursor: pointer; font-weight: 700;
-            box-shadow: 0 4px 10px rgba(255, 143, 169, 0.2); transition: background-color 0.2s, transform 0.1s;
-        }
-        .btn-execute:hover { background-color: var(--dark-pink); }
-        .btn-execute:active { transform: scale(0.99); }
-
+        .slider { -webkit-appearance: none; width: 100%; height: 10px; border-radius: 5px; background: var(--bg-color); outline: none; border: 2px solid var(--soft-pink); margin: 10px 0; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--main-pink); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        .btn-execute { width: 100%; background-color: var(--main-pink); color: white; padding: 14px; border-radius: 16px; border: none; font-size: 1rem; cursor: pointer; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-execute:active { transform: scale(0.98); }
+        .btn-sub { background: var(--card-bg); border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
+        
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .list-entry {
-            background: #fffcfd; padding: 12px 15px; border-radius: 16px;
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .entry-info { display: flex; flex-direction: column; gap: 4px; flex: 1; margin-right: 8px; }
-        .entry-title { font-size: 0.9rem; color: var(--text-color); word-break: break-all; }
+        .list-entry { background: var(--bg-color); padding: 12px 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .entry-title { font-size: 0.9rem; color: var(--text-color); }
         .entry-meta { font-size: 0.75rem; color: var(--text-muted); }
-        
-        .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1rem; opacity: 0.5; transition: opacity 0.2s; padding: 4px; }
-        .btn-action:hover { opacity: 1; }
-
-        .danger-zone { display: flex; justify-content: center; gap: 15px; margin: 30px 0 50px 0; }
-        .btn-sub { background: rgba(255, 255, 255, 0.8); border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
-
+        .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.7; padding: 5px; }
         .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .tag-badge { background-color: var(--soft-pink); padding: 5px 10px; border-radius: 10px; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; color: var(--text-color); }
+        .tag-badge { background-color: var(--soft-pink); padding: 5px 10px; border-radius: 10px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px; }
 
         @media (max-width: 900px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
-            .bottom-nav {
-                display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-                background-color: rgba(255, 251, 250, 0.95); border-top: 3px solid var(--soft-pink);
-                justify-content: space-around; align-items: center; z-index: 1000;
-                backdrop-filter: blur(5px);
-            }
-            .bottom-nav .nav-item { padding: 0; flex: 1; height: 100%; }
-            .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 90px 15px; }
-            .dashboard-grid { grid-template-columns: 1fr; gap: 15px; }
-            .nav-icon-img { width: 46px; height: 46px; }
-            .nav-item.active, .nav-item:hover { border-radius: 0; width: 100%; margin: 0; }
+            .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background-color: var(--card-bg); border-top: 3px solid var(--soft-pink); justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+            .bottom-nav .nav-item { padding: 0; flex: 1; height: 100%; justify-content: center; }
+            .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 100px 15px; }
+            .nav-icon-img { width: 32px; height: 32px; }
+            .nav-item.active, .nav-item:hover { border-radius: 0; width: 100%; margin: 0; background-color: transparent; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ロック画面 -->
-    <div id="lock-screen">
-        <div class="lock-container">
-            <h2>ENTER PASSWORD</h2>
-            <input type="password" id="pass-input">
-            <button onclick="checkPassword()">Open</button>
-        </div>
-    </div>
+    <div id="lock-screen"><div class="lock-container"><h2>ENTER PASSWORD</h2><input type="password" id="pass-input"><button onclick="checkPassword()">Open</button></div></div>
 
-    <!-- 🎀 PC用サイドメニュー -->
     <aside class="sidebar">
         <div class="sidebar-menu">
-            <button class="nav-item active" onclick="switchView('dashboard')">
-                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png" alt="ダッシュボード">
-                ダッシュボード
-            </button>
-            <button class="nav-item" onclick="switchView('rewards')">
-                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png" alt="ご褒美ストア">
-                ご褒美ストア
-            </button>
-            <button class="nav-item" onclick="switchView('goals')">
-                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="各種設定">
-                各種設定
-            </button>
+            <button class="nav-item active" onclick="switchView('dashboard')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png">ダッシュボード</button>
+            <button class="nav-item" onclick="switchView('analytics')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png">レポート</button>
+            <button class="nav-item" onclick="switchView('rewards')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png">ストア</button>
+            <button class="nav-item" onclick="switchView('goals')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png">設定</button>
         </div>
     </aside>
 
-    <!-- 📱 スマホ用ボトムメニュー -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchView('dashboard')">
-            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png" alt="ダッシュボード">
-            ダッシュボード
-        </button>
-        <button class="nav-item" onclick="switchView('rewards')">
-            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png" alt="ご褒美ストア">
-            ご褒美ストア
-        </button>
-        <button class="nav-item" onclick="switchView('goals')">
-            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="各種設定">
-            各種設定
-        </button>
+        <button class="nav-item active" onclick="switchView('dashboard')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png">記録</button>
+        <button class="nav-item" onclick="switchView('analytics')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png">分析</button>
+        <button class="nav-item" onclick="switchView('rewards')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png">ストア</button>
+        <button class="nav-item" onclick="switchView('goals')"><img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png">設定</button>
     </nav>
 
-    <!-- メインコンテンツ -->
     <main class="main-wrapper">
-        
-        <!-- ヘッダー -->
         <header class="header-section">
             <div class="user-tabs">
                 <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
@@ -281,371 +130,196 @@
             </div>
         </header>
 
-        <!-- 🏠 ① ダッシュボード画面 -->
+        <!-- 🏠 ダッシュボード画面 (1カラムレイアウト) -->
         <div id="view-dashboard" class="view-content active">
-            <div class="dashboard-grid">
+            <div class="mobile-container">
                 
-                <!-- 左列: 進捗状況 -->
+                <!-- 1. 進捗状況 -->
                 <section class="notebook-card">
                     <h3 class="card-title">進捗状況</h3>
-                    <p class="card-subtitle">現在の状況</p>
-                    
-                    <div class="point-display-container">
-                        <div style="font-size:0.75rem; color:var(--text-muted)">まるちぽいんと</div>
-                        <div class="point-val"><span id="dash-points">0</span><span style="font-size:1rem; margin-left:4px;">pt</span></div>
-                    </div>
-                    <div class="point-display-container">
-                        <div style="font-size:0.75rem; color:var(--text-muted)">ごうけいべんきょう時間</div>
-                        <div class="study-time-val" id="dash-study-time">0h 00m</div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <div class="point-display-container" style="flex:1;">
+                            <div style="font-size:0.75rem; color:var(--text-muted)">マルチポイント</div>
+                            <div class="point-val"><span id="dash-points">0</span><span style="font-size:1rem;">pt</span></div>
+                        </div>
+                        <div class="point-display-container" style="flex:1;">
+                            <div style="font-size:0.75rem; color:var(--text-muted)">合計勉強時間</div>
+                            <div class="point-val" style="color:var(--text-color);" id="dash-study-time">0h 00m</div>
+                        </div>
                     </div>
                     <div>
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
-                            <span>今週のもくひょう達成率</span>
-                            <span id="dash-progress-text">0%</span>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
+                            <span>今週の目標達成率</span><span id="dash-progress-text">0%</span>
                         </div>
                         <div class="progress-bar-bg"><div id="dash-progress-bar" class="progress-bar-fill"></div></div>
                     </div>
                 </section>
 
-                <!-- 中列: 勉強きろく＆カテゴリその場管理 -->
+                <!-- 2. タイマー -->
                 <section class="notebook-card">
-                    <h3 class="card-title">勉強記録</h3>
-                    <p class="card-subtitle">勉強した時間と科目を記録</p>
-                    
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label for="quick-category-select">勉強した科目・カテゴリ:</label>
-                        <select id="quick-category-select">
-                            <option value="勉強">勉強</option>
-                        </select>
+                    <h3 class="card-title">学習タイマー</h3>
+                    <p class="card-subtitle">勉強を始めたらStart！</p>
+                    <div class="timer-display" id="timer-display">00:00:00</div>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                        <button class="btn-execute" style="width:auto; padding:12px 24px;" onclick="startTimer()">Start</button>
+                        <button class="btn-execute" style="width:auto; padding:12px 24px; background-color:var(--text-muted);" onclick="pauseTimer()">Pause</button>
+                        <button class="btn-execute" style="width:auto; padding:12px 24px; background-color:var(--soft-pink); color:var(--text-color);" onclick="resetTimer()">Reset</button>
                     </div>
-
-                    <div class="form-group" style="margin-bottom: 20px; background: #fffcfd; padding: 12px; border-radius: 16px; border: 2px dashed var(--soft-pink);">
-                        <label style="font-size: 0.8rem; color: var(--dark-pink);">カテゴリの編集:</label>
-                        <div style="display:flex; gap: 6px; margin-top: 4px;">
-                            <input type="text" id="input-new-category" placeholder="新しいカテゴリ名" style="padding: 8px 12px; font-size: 0.85rem;">
-                            <button class="btn-execute" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="addCustomCategory()">追加</button>
-                        </div>
-                        <div class="tag-list" id="custom-tags-container"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-                            <label for="quick-hours">勉強した時間:</label>
-                            <span id="quick-hours-label">1.0時間 (+1.0pt)</span>
-                        </div>
-                        <input type="range" id="quick-hours" class="slider" min="0.5" max="12" step="0.5" value="1" oninput="updateQuickLabel(this.value)">
-                    </div>
-
-                    <button class="btn-execute" onclick="submitQuickLog()">記録をノートに書く</button>
+                    <button class="btn-execute" style="background-color:var(--dark-pink);" onclick="logTimerTime()">この時間を下のスライダーにセット</button>
                 </section>
 
-                <!-- 右列: 活動履歴 -->
+                <!-- 3. 勉強記録 -->
+                <section class="notebook-card">
+                    <h3 class="card-title">勉強記録</h3>
+                    <div class="form-group">
+                        <label>科目・カテゴリ:</label>
+                        <select id="quick-category-select"><option value="勉強">勉強</option></select>
+                    </div>
+                    <div class="form-group">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                            <label>勉強した時間:</label><span id="quick-hours-label" style="font-weight:bold; color:var(--dark-pink);">1.0時間 (+1.0pt)</span>
+                        </div>
+                        <input type="range" id="quick-hours" class="slider" min="0.1" max="12" step="0.1" value="1" oninput="updateQuickLabel(this.value)">
+                    </div>
+                    <button class="btn-execute" onclick="submitQuickLog()">記録を保存する</button>
+                </section>
+
+                <!-- 4. 活動履歴 -->
                 <section class="notebook-card">
                     <h3 class="card-title">活動履歴</h3>
-                    <p class="card-subtitle">最新の履歴ログ</p>
-                    <ul class="item-list" id="dash-history-list" style="max-height: 380px; overflow-y: auto;"></ul>
+                    <ul class="item-list" id="dash-history-list" style="max-height: 300px; overflow-y: auto;"></ul>
                 </section>
 
             </div>
         </div>
 
-        <!-- 🎁 ② ご褒美ストア画面 -->
+        <!-- 📊 レポート画面 -->
+        <div id="view-analytics" class="view-content">
+            <div class="mobile-container">
+                <section class="notebook-card">
+                    <h3 class="card-title">学習時間グラフ</h3>
+                    <div class="form-group"><select id="chart-period" onchange="renderCharts()"><option value="7">直近7日間</option><option value="28">直近4週間</option></select></div>
+                    <div class="chart-container"><canvas id="barChart"></canvas></div>
+                </section>
+                <section class="notebook-card">
+                    <h3 class="card-title">科目バランス</h3>
+                    <div class="chart-container" style="height: 300px;"><canvas id="pieChart"></canvas></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 🎁 ご褒美ストア画面 -->
         <div id="view-rewards" class="view-content">
-            <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
+            <div class="mobile-container">
                 <section class="notebook-card">
                     <h3 class="card-title">ご褒美作成</h3>
-                    <p class="card-subtitle">新しいご褒美をつくる</p>
-                    <div class="form-group">
-                        <label>ご褒美の名前:</label>
-                        <input type="text" id="reward-name">
-                    </div>
-                    <div class="form-group">
-                        <label>ひつようなポイント:</label>
-                        <input type="number" id="reward-cost" min="1" value="5">
-                    </div>
+                    <div class="form-group"><label>ご褒美の名前:</label><input type="text" id="reward-name"></div>
+                    <div class="form-group"><label>ひつようなポイント:</label><input type="number" id="reward-cost" min="1" value="5"></div>
                     <button class="btn-execute" onclick="submitRewardItem()">ストアへ並べる</button>
                 </section>
                 <section class="notebook-card">
-                    <h3 class="card-title">ご褒美ストア</h3>
-                    <p class="card-subtitle">ポイントをつかって交換しよう！ (所持: <span id="shop-points" style="color:var(--dark-pink)">0</span>pt)</p>
-                    <div id="shop-container" class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:15px;"></div>
+                    <h3 class="card-title">ストア (所持: <span id="shop-points" style="color:var(--dark-pink);">0</span>pt)</h3>
+                    <div id="shop-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
                 </section>
             </div>
         </div>
 
-        <!-- 📊 ③ 各種設定画面 -->
+        <!-- ⚙️ 各種設定画面 -->
         <div id="view-goals" class="view-content">
-            <div style="max-width: 500px; margin: 0 auto;">
+            <div class="mobile-container">
                 <section class="notebook-card">
-                    <h3 class="card-title">目標設定</h3>
-                    <p class="card-subtitle">今週の目標勉強時間をきめる</p>
-                    <div class="form-group">
-                        <label>目標時間 (時間単位):</label>
-                        <input type="number" id="input-goal-hours" min="1" value="45">
+                    <h3 class="card-title">各種設定</h3>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label>ダークモード（クロミちゃん仕様）:</label>
+                        <button class="btn-execute" id="dark-mode-btn" style="background-color: var(--soft-pink); color: var(--text-color);" onclick="toggleDarkMode()">🌙 ダークモードをON</button>
                     </div>
-                    <button class="btn-execute" onclick="submitGoalSettings()">目標時間をほぞんする</button>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label>今週の目標時間 (h):</label>
+                        <input type="number" id="input-goal-hours" min="1" value="45">
+                        <button class="btn-execute" style="margin-top:10px;" onclick="submitGoalSettings()">目標時間を保存</button>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--dark-pink);">カテゴリの編集:</label>
+                        <div style="display:flex; gap: 6px;">
+                            <input type="text" id="input-new-category" placeholder="新しいカテゴリ名">
+                            <button class="btn-execute" style="width: auto; padding: 12px 20px;" onclick="addCustomCategory()">追加</button>
+                        </div>
+                        <div class="tag-list" id="custom-tags-container"></div>
+                    </div>
                 </section>
+                <div style="text-align: center; margin-top:30px;"><button class="btn-sub" style="color:red;" onclick="triggerResetFlow()">全データの初期化</button></div>
             </div>
         </div>
-
-        <footer class="danger-zone">
-            <button class="btn-sub" onclick="alert('データ連携完了後に自動保存されます')">データ同期</button>
-            <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">全データの初期化</button>
-        </footer>
-
     </main>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
-            authDomain: "gohoubipt.firebaseapp.com",
-            databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "gohoubipt",
-            storageBucket: "gohoubipt.appspot.com",
-            messagingSenderId: "133130532450",
-            appId: "1:133130532450:web:41476b156bb892e62e833b",
-            measurementId: "G-DRQR6ZJQLE"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw", authDomain: "gohoubipt.firebaseapp.com", databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "gohoubipt", storageBucket: "gohoubipt.appspot.com", messagingSenderId: "133130532450", appId: "1:133130532450:web:41476b156bb892e62e833b" };
+        const SECRET_PASSWORD = "ayu"; let db; let currentUser = 'ayu'; let currentPoints = 0; let currentGoal = 45; let dbListenerRef = null; let globalHistoryData = {};
 
-        const SECRET_PASSWORD = "ayu";
-        let db;
-        let currentUser = 'ayu';
-        let currentPoints = 0;
-        let currentGoal = 45;
-        let dbListenerRef = null;
-        let activeCategories = [];
+        function checkPassword() { if(document.getElementById("pass-input").value === SECRET_PASSWORD) { firebase.initializeApp(firebaseConfig); db = firebase.database(); document.getElementById("lock-screen").style.opacity = "0"; setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500); startListening(); } else alert("パスワードがちがいます！"); }
+        function switchView(viewName) { document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(btn => { if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active'); else btn.classList.remove('active'); }); if(viewName === 'analytics') renderCharts(); }
+        function switchUser(userKey) { if(currentUser === userKey) return; currentUser = userKey; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${userKey}`).classList.add('active'); if(dbListenerRef) dbListenerRef.off(); startListening(); }
+        function toggleDarkMode() { const body = document.body; body.classList.toggle('dark-mode'); const btn = document.getElementById('dark-mode-btn'); if(body.classList.contains('dark-mode')){ btn.innerText = "☀️ ライトモードに戻す"; btn.style.backgroundColor = "#c96788"; btn.style.color = "#fff"; } else { btn.innerText = "🌙 ダークモードをON"; btn.style.backgroundColor = "var(--soft-pink)"; btn.style.color = "var(--text-color)"; } if(document.getElementById('view-analytics').classList.contains('active')) renderCharts(); }
 
-        function checkPassword() {
-            const inputEl = document.getElementById("pass-input");
-            if (inputEl.value === SECRET_PASSWORD) {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                document.getElementById("lock-screen").style.opacity = "0";
-                setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500);
-                startListening();
-            } else {
-                alert("パスワードがちがいます！");
-                inputEl.value = "";
-            }
-        }
-
-        function switchView(viewName) {
-            document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${viewName}`).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-        }
-
-        function switchUser(userKey) {
-            if (currentUser === userKey) return;
-            currentUser = userKey;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-${userKey}`).classList.add('active');
-            if (dbListenerRef) dbListenerRef.off();
-            startListening();
-        }
+        let timerSec = 0; let timerInterval = null;
+        function formatTime(s) { const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); const sec = s%60; return `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${sec<10?'0':''}${sec}`; }
+        function startTimer() { if(!timerInterval) timerInterval = setInterval(() => { timerSec++; document.getElementById('timer-display').innerText = formatTime(timerSec); }, 1000); }
+        function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function resetTimer() { pauseTimer(); timerSec = 0; document.getElementById('timer-display').innerText = "00:00:00"; }
+        function logTimerTime() { pauseTimer(); let hours = (timerSec / 3600).toFixed(1); if(hours < 0.1) hours = 0.1; document.getElementById('quick-hours').value = hours; updateQuickLabel(hours); alert(`タイマーの記録（${hours}時間）をセットしました！`); resetTimer(); }
 
         function startListening() {
             dbListenerRef = db.ref(`data/${currentUser}`);
-            dbListenerRef.on("value", (snapshot) => {
-                const data = snapshot.val() || {};
-                currentPoints = data.points || 0;
-                currentGoal = data.goalHours || 45;
-
-                const pointsElems = ['dash-points', 'shop-points'];
-                pointsElems.forEach(id => {
-                    const elem = document.getElementById(id);
-                    if(elem) elem.innerText = currentPoints;
-                });
-                
-                const goalInput = document.getElementById("input-goal-hours");
-                if(goalInput) goalInput.value = currentGoal;
-
-                activeCategories = data.categories ? Object.values(data.categories) : ["勉強"];
-                renderCategoryDropdown(data.categories || {});
-                renderCategorySettings(data.categories || {});
-
-                renderHistory(data.history || {});
-                renderRewards(data.rewardStore || {});
+            dbListenerRef.on("value", snap => {
+                const data = snap.val() || {}; currentPoints = data.points || 0; currentGoal = data.goalHours || 45; globalHistoryData = data.history || {};
+                document.getElementById('dash-points').innerText = currentPoints; document.getElementById('shop-points').innerText = currentPoints; document.getElementById('input-goal-hours').value = currentGoal;
+                renderCategoryDropdown(data.categories || {}); renderCategorySettings(data.categories || {}); renderHistory(globalHistoryData); renderRewards(data.rewardStore || {});
+                if(document.getElementById('view-analytics').classList.contains('active')) renderCharts();
             });
         }
 
-        function renderCategoryDropdown(catMap) {
-            const select = document.getElementById("quick-category-select");
-            if(!select) return;
-            select.innerHTML = "";
+        function renderCategoryDropdown(catMap) { const select = document.getElementById("quick-category-select"); select.innerHTML = ""; const list = Object.keys(catMap).length > 0 ? Object.values(catMap) : ["勉強"]; list.forEach(cat => { const opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); }); }
+        function renderCategorySettings(catMap) { const container = document.getElementById("custom-tags-container"); container.innerHTML = ""; const entries = Object.keys(catMap).map(k => ({key: k, name: catMap[k]})); if(entries.length === 0) return container.innerHTML = `<p style="font-size:0.75rem;">デフォルトが適用されています。</p>`; entries.forEach(item => { const badge = document.createElement("div"); badge.className = "tag-badge"; badge.innerHTML = `<span>${item.name}</span><span style="cursor:pointer;" onclick="deleteCustomCategory('${item.key}')">✕</span>`; container.appendChild(badge); }); }
+        function addCustomCategory() { const val = document.getElementById("input-new-category").value.trim(); if(val) db.ref().child(`data/${currentUser}/categories`).push().set(val).then(()=>document.getElementById("input-new-category").value=""); }
+        function deleteCustomCategory(key) { db.ref(`data/${currentUser}/categories/${key}`).remove(); }
+
+        function updateQuickLabel(val) { document.getElementById('quick-hours-label').innerText = `${val}時間 (+${val}pt)`; }
+        function submitQuickLog() { const content = document.getElementById("quick-category-select").value || "勉強"; const hours = parseFloat(document.getElementById("quick-hours").value); const newKey = db.ref().child(`data/${currentUser}/history`).push().key; db.ref(`data/${currentUser}`).transaction(d => { if(d) { d.points = (d.points||0)+hours; if(!d.history) d.history={}; d.history[newKey] = {date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: `学習：${content} (${hours}h)`, points: hours}; } return d; }); }
+
+        function renderHistory(hMap) {
+            const container = document.getElementById("dash-history-list"); container.innerHTML = ""; let totalMins = 0; let weeklyMins = 0;
+            const startOfWeek = new Date(); startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); startOfWeek.setHours(0,0,0,0);
+            const list = Object.keys(hMap).map(k => ({key: k, ...hMap[k]}));
+            list.forEach(item => { if(item.action && item.action.includes('学習')) { const match = item.action.match(/([\d.]+)h/); if(match){ const mins = parseFloat(match[1])*60; totalMins += mins; if((item.timestamp||0)>=startOfWeek.getTime()) weeklyMins += mins; } } });
             
-            const list = Object.keys(catMap).map(k => catMap[k]);
-            if(list.length === 0) {
-                ["勉強"].forEach(cat => {
-                    const opt = document.createElement("option");
-                    opt.value = cat; opt.innerText = cat;
-                    select.appendChild(opt);
-                });
-            } else {
-                list.forEach(cat => {
-                    const opt = document.createElement("option");
-                    opt.value = cat; opt.innerText = cat;
-                    select.appendChild(opt);
-                });
-            }
-        }
-
-        function renderCategorySettings(catMap) {
-            const container = document.getElementById("custom-tags-container");
-            if(!container) return;
-            container.innerHTML = "";
+            const h = Math.floor(totalMins/60); const m = Math.floor(totalMins%60); document.getElementById("dash-study-time").innerText = `${h}h ${m<10?'0':''}${m}m`;
+            let p = Math.floor(((weeklyMins/60)/currentGoal)*100); if(p>100) p=100; document.getElementById("dash-progress-bar").style.width = `${p}%`; document.getElementById("dash-progress-text").innerText = `${p}%`;
             
-            const entries = Object.keys(catMap).map(k => ({key: k, name: catMap[k]}));
-            if(entries.length === 0) {
-                container.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0;">まだ登録がありません。デフォルトの「勉強」が適用されています。</p>`;
-                return;
-            }
-
-            entries.forEach(item => {
-                const badge = document.createElement("div");
-                badge.className = "tag-badge";
-                badge.innerHTML = `
-                    <span>${item.name}</span>
-                    <span style="cursor:pointer; opacity:0.6; font-weight:normal;" onclick="deleteCustomCategory('${item.key}')">✕</span>
-                `;
-                container.appendChild(badge);
+            list.reverse().forEach(item => { 
+                const isStudy = item.action && item.action.includes('学習');
+                const editBtn = isStudy ? `<button class="btn-action" onclick="editHistory('${item.key}')">✏️</button>` : '';
+                const li = document.createElement("li"); li.className = "list-entry"; 
+                li.innerHTML = `<div class="entry-info"><span class="entry-title">${item.action}</span><span class="entry-meta">${item.date}</span></div><div><span style="color:var(--dark-pink); margin-right:8px;">${item.points>0?'+':''}${item.points}pt</span>${editBtn}<button class="btn-action" onclick="deleteHistory('${item.key}')">🗑️</button></div>`; 
+                container.appendChild(li); 
             });
         }
 
-        function addCustomCategory() {
-            const input = document.getElementById("input-new-category");
-            const val = input.value.trim();
-            if(!val) return;
-
-            const newKey = db.ref().child(`data/${currentUser}/categories`).push().key;
-            db.ref(`data/${currentUser}/categories/${newKey}`).set(val).then(() => {
-                input.value = "";
-            });
-        }
-
-        function deleteCustomCategory(key) {
-            db.ref(`data/${currentUser}/categories/${key}`).remove();
-        }
-
-        function updateQuickLabel(val) {
-            document.getElementById('quick-hours-label').innerText = `${val}時間 (+${val}pt)`;
-        }
-
-        function submitQuickLog() {
-            const select = document.getElementById("quick-category-select");
-            let content = select ? select.value : "勉強";
-            const hours = parseFloat(document.getElementById("quick-hours").value);
-            
-            const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
-            db.ref(`data/${currentUser}`).transaction(data => {
-                if (data) {
-                    data.points = (data.points || 0) + hours;
-                    if (!data.history) data.history = {};
-                    data.history[newLogKey] = {
-                        date: new Date().toLocaleDateString('ja-JP'),
-                        timestamp: Date.now(),
-                        action: `学習：${content} (${hours}h)`,
-                        points: hours
-                    };
-                }
-                return data;
-            });
-        }
-
-        function renderHistory(historyMap) {
-            const container = document.getElementById("dash-history-list");
-            if(!container) return;
-            container.innerHTML = "";
-            const list = Object.keys(historyMap).map(k => ({key: k, ...historyMap[k]}));
-            
-            let totalMins = 0;
-            let weeklyMins = 0;
-            const startOfWeek = new Date();
-            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-            startOfWeek.setHours(0,0,0,0);
-
-            list.forEach(item => {
-                if(item.action && item.action.includes('学習')) {
-                    const match = item.action.match(/([\d.]+)h/);
-                    if(match) {
-                        const mins = parseFloat(match[1]) * 60;
-                        totalMins += mins;
-                        if((item.timestamp || 0) >= startOfWeek.getTime()) weeklyMins += mins;
-                    }
-                }
-            });
-
-            const h = Math.floor(totalMins / 60);
-            const m = Math.floor(totalMins % 60);
-            const timeElem = document.getElementById("dash-study-time");
-            if(timeElem) timeElem.innerText = `${h}h ${m < 10 ? '0'+m : m}m`;
-
-            let p = Math.floor(((weeklyMins/60) / currentGoal) * 100);
-            if(p > 100) p = 100;
-            const barElem = document.getElementById("dash-progress-bar");
-            if(barElem) barElem.style.width = `${p}%`;
-            const textElem = document.getElementById("dash-progress-text");
-            if(textElem) textElem.innerText = `${p}%`;
-
-            list.reverse().forEach(item => {
-                const li = document.createElement("li");
-                li.className = "list-entry";
-                
-                const isStudyLog = item.action && item.action.includes('学習');
-                const editButtonHtml = isStudyLog ? `<button class="btn-action" onclick="editHistory('${item.key}')">✏️</button>` : '';
-
-                li.innerHTML = `
-                    <div class="entry-info">
-                        <span class="entry-title">${item.action}</span>
-                        <span class="entry-meta">${item.date}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <span style="color:var(--dark-pink); margin-right:4px; font-size:0.85rem; white-space:nowrap;">${item.points > 0 ? '+' : ''}${item.points}pt</span>
-                        ${editButtonHtml}
-                        <button class="btn-action" onclick="deleteHistory('${item.key}')">🗑️</button>
-                    </div>
-                `;
-                container.appendChild(li);
-            });
-        }
-
+        // ✏️ 履歴の編集機能を復活させました！
         function editHistory(key) {
             db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => {
-                const item = snap.val();
-                if (!item) return;
-
-                let currentCat = "勉強";
-                let currentHours = item.points;
+                const item = snap.val(); if (!item) return;
+                let currentCat = "勉強"; let currentHours = item.points;
+                const catMatch = item.action.match(/学習：(.+?)\s*\(/); if (catMatch) currentCat = catMatch[1];
                 
-                const catMatch = item.action.match(/学習：(.+?)\s*\(/);
-                if (catMatch) currentCat = catMatch[1];
-
-                const newCat = prompt("新しい科目・カテゴリ名を入力してください:", currentCat);
-                if (newCat === null) return;
-
-                const newHoursStr = prompt("新しい勉強時間（時間単位）を入力してください（例: 1.5）:", currentHours);
-                if (newHoursStr === null) return;
+                const newCat = prompt("新しい科目・カテゴリ名を入力してください:", currentCat); if (newCat === null) return;
+                const newHoursStr = prompt("新しい勉強時間（時間単位）を入力してください（例: 1.5）:", currentHours); if (newHoursStr === null) return;
                 
-                const newHours = parseFloat(newHoursStr);
-                if (isNaN(newHours) || newHours <= 0) {
-                    alert("正しい数値を入力してください。");
-                    return;
-                }
-
+                const newHours = parseFloat(newHoursStr); if (isNaN(newHours) || newHours <= 0) return alert("正しい数値を入力してください。");
+                
                 db.ref(`data/${currentUser}`).transaction(data => {
                     if (data) {
-                        const oldPoints = item.points;
-                        const diff = newHours - oldPoints;
-
-                        if ((data.points || 0) + diff < 0) {
-                            alert("全体の所持ポイントがマイナスになってしまうため変更できません！");
-                            return; 
-                        }
-
+                        const diff = newHours - item.points;
+                        if ((data.points || 0) + diff < 0) { alert("全体の所持ポイントがマイナスになってしまうため変更できません！"); return; }
                         data.points = (data.points || 0) + diff;
                         if (data.history && data.history[key]) {
                             data.history[key].action = `学習：${newCat.trim()} (${newHours}h)`;
@@ -657,92 +331,28 @@
             });
         }
 
-        function deleteHistory(key) {
-            db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => {
-                const item = snap.val();
-                if(!item) return;
-                if(currentPoints - item.points < 0) { alert("所持ポイントがマイナスになるため削除できません！"); return; }
-                db.ref(`data/${currentUser}`).transaction(data => {
-                    if (data) {
-                        data.points -= item.points;
-                        if(data.history) delete data.history[key];
-                    }
-                    return data;
-                });
-            });
-        }
+        function deleteHistory(key) { db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => { const item = snap.val(); if(!item) return; if(currentPoints - item.points < 0) return alert("ポイントがマイナスになるため削除できません！"); db.ref(`data/${currentUser}`).transaction(d => { if(d){ d.points -= item.points; if(d.history) delete d.history[key]; } return d; }); }); }
 
-        function submitRewardItem() {
-            const name = document.getElementById("reward-name").value.trim();
-            const cost = parseInt(document.getElementById("reward-cost").value, 10);
-            if(!name || isNaN(cost) || cost <= 0) { alert("ご褒美名と正しいポイントを入力してね！"); return; }
+        function submitRewardItem() { const name = document.getElementById("reward-name").value.trim(); const cost = parseInt(document.getElementById("reward-cost").value, 10); if(name && cost>0) db.ref().child(`data/${currentUser}/rewardStore`).push().set({name, cost}).then(()=>{ document.getElementById("reward-name").value=""; }); }
+        function renderRewards(sMap) { const container = document.getElementById("shop-container"); container.innerHTML = ""; Object.keys(sMap).forEach(key => { const item = sMap[key]; const card = document.createElement("div"); card.style.background = "var(--bg-color)"; card.style.padding = "15px"; card.style.borderRadius = "16px"; card.style.textAlign = "center"; card.style.position = "relative"; card.innerHTML = `<div style="font-size:0.9rem;">${item.name}</div><div style="font-size:1.1rem; color:var(--dark-pink); margin:5px 0;">${item.cost}pt</div><button class="btn-execute" style="padding:6px; font-size:0.8rem;" onclick="exchangeReward('${item.name}', ${item.cost})">交換</button><button class="btn-action" style="position:absolute; top:2px; right:2px; padding:2px;" onclick="db.ref('data/${currentUser}/rewardStore/${key}').remove()">✕</button>`; container.appendChild(card); }); }
+        function exchangeReward(name, cost) { if(currentPoints < cost) return alert("ポイント不足です！"); if(confirm(`「${name}」を交換しますか？`)) { const k = db.ref().child(`data/${currentUser}/history`).push().key; db.ref(`data/${currentUser}`).transaction(d => { if(d){ d.points -= cost; if(!d.history) d.history={}; d.history[k] = {date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: `交換：${name}`, points: -cost}; } return d; }); } }
+        function submitGoalSettings() { db.ref(`data/${currentUser}/goalHours`).set(parseInt(document.getElementById("input-goal-hours").value, 10)); alert("目標を保存しました！"); }
+        function triggerResetFlow() { if(confirm("全データを初期化しますか？")) db.ref(`data/${currentUser}`).remove(); }
 
-            const newKey = db.ref().child(`data/${currentUser}/rewardStore`).push().key;
-            db.ref(`data/${currentUser}/rewardStore/${newKey}`).set({ name, cost }).then(() => {
-                document.getElementById("reward-name").value = "";
-                document.getElementById("reward-cost").value = 5;
-            });
-        }
-
-        function renderRewards(storeMap) {
-            const container = document.getElementById("shop-container");
-            if(!container) return;
-            container.innerHTML = "";
-            Object.keys(storeMap).forEach(key => {
-                const item = storeMap[key];
-                const card = document.createElement("div");
-                card.className = "notebook-card";
-                card.style.textAlign = "center";
-                card.style.padding = "15px";
-                card.innerHTML = `
-                    <div style="font-size:0.95rem; margin-bottom:8px;">${item.name}</div>
-                    <div style="font-size:1.1rem; color:var(--dark-pink); font-family:var(--font-eng); margin-bottom:10px;">${item.cost} pt</div>
-                    <button class="btn-execute" style="padding:6px; font-size:0.8rem;" onclick="exchangeReward('${item.name}', ${item.cost})">交換する</button>
-                    <button class="btn-action" style="position:absolute; top:5px; right:5px; font-size:0.8rem;" onclick="deleteRewardStoreItem('${key}')">✕</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function exchangeReward(name, cost) {
-            if(currentPoints < cost) { alert("ポイントが足りません！"); return; }
-            if(!confirm(`「${name}」を ${cost}pt で交換しますか？`)) return;
-
-            const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
-            db.ref(`data/${currentUser}`).transaction(data => {
-                if (data) {
-                    data.points = (data.points || 0) - cost;
-                    if (!data.history) data.history = {};
-                    data.history[newLogKey] = {
-                        date: new Date().toLocaleDateString('ja-JP'),
-                        timestamp: Date.now(),
-                        action: `交換：${name}`,
-                        points: -cost
-                    };
-                }
-                return data;
-            });
-        }
-
-        function deleteRewardStoreItem(key) {
-            if(confirm("このご褒美アイテムをストアから削除しますか？")) db.ref(`data/${currentUser}/rewardStore/${key}`).remove();
-        }
-
-        function submitGoalSettings() {
-            const hoursElem = document.getElementById("input-goal-hours");
-            if(!hoursElem) return;
-            const hours = parseInt(hoursElem.value, 10);
-            if(isNaN(hours) || hours <= 0) { alert("正しい目標時間を入力してね！"); return; }
-            db.ref(`data/${currentUser}/goalHours`).set(hours).then(() => {
-                alert("目標時間を変更しました！");
-                switchView('dashboard');
-            });
-        }
-
-        function triggerResetFlow() {
-            if(confirm("注意！現在のユーザーのすべてのデータ（ポイント、履歴）が完全に初期化されます。本当によろしいですか？")) {
-                db.ref(`data/${currentUser}`).remove().then(() => alert("初期化が完了しました。"));
-            }
+        let barChartInstance = null; let pieChartInstance = null;
+        function renderCharts() {
+            const daysToLookBack = parseInt(document.getElementById("chart-period").value, 10); const now = new Date(); const timeLimit = now.getTime() - (daysToLookBack * 24 * 60 * 60 * 1000);
+            let dateMap = {}; let catMap = {};
+            for(let i = daysToLookBack - 1; i >= 0; i--) { let d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000); dateMap[`${d.getMonth()+1}/${d.getDate()}`] = 0; }
+            Object.values(globalHistoryData).forEach(item => { if(item.action && item.action.includes('学習') && item.timestamp >= timeLimit) { const matchTime = item.action.match(/([\d.]+)h/); const matchCat = item.action.match(/学習：(.+?)\s*\(/); if(matchTime && matchCat) { const h = parseFloat(matchTime[1]); const cat = matchCat[1]; const d = new Date(item.timestamp); const dateStr = `${d.getMonth()+1}/${d.getDate()}`; if(dateMap[dateStr] !== undefined) dateMap[dateStr] += h; catMap[cat] = (catMap[cat] || 0) + h; } } });
+            
+            const isDark = document.body.classList.contains('dark-mode'); const textColor = isDark ? '#fce4e8' : '#5a4b4e'; const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'; const barColor = isDark ? '#e07b9e' : '#ff8fa9'; const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90'];
+            
+            const barCtx = document.getElementById('barChart').getContext('2d'); if(barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(barCtx, { type: 'bar', data: { labels: Object.keys(dateMap), datasets: [{ label: '学習時間 (h)', data: Object.values(dateMap), backgroundColor: barColor, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } }, plugins: { legend: { labels: { color: textColor } } } } });
+            
+            const pieCtx = document.getElementById('pieChart').getContext('2d'); if(pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(pieCtx, { type: 'doughnut', data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: pieColors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: textColor } } } } });
         }
     </script>
 </body>
