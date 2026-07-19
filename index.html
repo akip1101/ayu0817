@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Melodic Study Notebook</title>
+    <title>Study Dashboard</title>
     <!-- Google Fonts: 丸みのある可愛い日本語・英語フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Firebase SDK (CDN) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -50,371 +50,144 @@
             transition: opacity 0.5s ease;
         }
         .lock-illustration {
-            width: 140px;
-            height: 140px;
-            background: #ffffff;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            border: 4px solid #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 140px; height: 140px;
+            background: #ffffff; border-radius: 50%;
+            margin-bottom: 20px; border: 4px solid #ffffff;
+            display: flex; justify-content: center; align-items: center;
             box-shadow: 0 8px 20px rgba(255, 143, 169, 0.2);
-            overflow: hidden;
         }
-        .lock-illustration img {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
-        }
+        .lock-illustration span { font-size: 4rem; }
         #lock-screen h2 {
-            font-size: 1.2rem;
-            font-family: var(--font-eng);
-            color: var(--dark-pink);
-            margin-bottom: 20px;
-            letter-spacing: 0.05em;
+            font-size: 1.2rem; font-family: var(--font-eng);
+            color: var(--dark-pink); margin-bottom: 20px;
         }
         #lock-screen input {
-            background: #ffffff;
-            border: 2px solid var(--soft-pink);
-            border-radius: 24px;
-            padding: 12px;
-            font-size: 1.2rem;
-            width: 200px;
-            text-align: center;
-            outline: none;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(255, 183, 202, 0.2);
+            background: #ffffff; border: 2px solid var(--soft-pink);
+            border-radius: 24px; padding: 12px; font-size: 1.2rem;
+            width: 200px; text-align: center; outline: none; margin-bottom: 20px;
         }
         #lock-screen button {
-            background-color: var(--main-pink);
-            color: white;
-            border: none;
-            padding: 12px 50px;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
-            font-weight: 700;
+            background-color: var(--main-pink); color: white; border: none;
+            padding: 12px 50px; border-radius: 24px; font-size: 0.9rem;
+            cursor: pointer; font-weight: 700;
         }
 
-        /* 🎀 サイドナビゲーション (PC用) */
+        /* 🎀 ナビゲーション */
         .sidebar {
-            width: 90px;
-            background-color: #fffbfa;
-            border-right: 3px solid var(--soft-pink);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-            position: fixed;
-            top: 0; bottom: 0; left: 0;
-            z-index: 100;
+            width: 90px; background-color: #fffbfa; border-right: 3px solid var(--soft-pink);
+            display: flex; flex-direction: column; align-items: center; padding-top: 20px;
+            position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
         }
-        .sidebar-logo {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 30px;
-        }
-        .sidebar-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 20px; width: 100%; margin-top: 20px; }
+        
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-family: var(--font-eng);
-            font-size: 0.65rem;
-            font-weight: 600;
-            gap: 4px;
-            padding: 10px 0;
+            display: flex; flex-direction: column; align-items: center;
+            background: transparent; border: none; cursor: pointer;
+            color: var(--text-muted); font-family: var(--font-eng);
+            font-size: 0.65rem; font-weight: 600; gap: 4px; padding: 10px 0;
             transition: all 0.2s;
         }
         .nav-item.active, .nav-item:hover {
-            color: var(--dark-pink);
-            background-color: #ffeef2;
-            border-radius: 12px;
-            margin: 0 8px;
+            color: var(--dark-pink); background-color: #ffeef2;
+            border-radius: 12px; margin: 0 8px;
         }
-        .nav-icon {
-            font-size: 1.4rem;
-        }
-
-        /* 📱 スマホ用ボトムナビゲーション (初期状態は非表示) */
-        .bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 65px;
-            background-color: #fffbfa;
-            border-top: 3px solid var(--soft-pink);
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-        .bottom-nav .nav-item {
-            padding: 0;
-            flex: 1;
-        }
+        .nav-icon { font-size: 1.4rem; }
+        .bottom-nav { display: none; }
 
         /* 🏠 メインレイアウト */
         .main-wrapper {
-            margin-left: 90px; /* サイドバーの幅の分空ける */
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-            max-width: 1200px;
-            width: calc(100% - 90px);
+            margin-left: 90px; flex: 1; display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box; width: calc(100% - 90px);
         }
 
         /* 👑 ヘッダーエリア */
-        .header-section {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .top-banner {
-            max-width: 320px;
-            width: 80%;
-            height: auto;
-            margin-bottom: 10px;
-        }
-        .welcome-title {
-            font-family: var(--font-eng);
-            font-size: 1.5rem;
-            color: var(--dark-pink);
-            margin: 5px 0;
-        }
-        .welcome-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-color);
-            margin: 0;
-        }
+        .header-section { text-align: center; margin-bottom: 25px; margin-top: 10px; }
 
         /* 👥 ユーザー切り替えタブ */
         .user-tabs {
-            display: flex;
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 4px;
-            border: 2px solid var(--soft-pink);
-            margin: 15px auto;
-            max-width: 300px;
+            display: flex; background: #ffffff; border-radius: 24px;
+            padding: 4px; border: 2px solid var(--soft-pink); margin: 0 auto; max-width: 300px;
         }
         .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.2s;
+            flex: 1; background: transparent; border: none; padding: 10px;
+            border-radius: 20px; font-size: 0.85rem; color: var(--text-muted);
+            cursor: pointer; font-weight: 700; transition: all 0.2s;
         }
-        .tab-btn.active {
-            background: var(--main-pink);
-            color: white;
-        }
+        .tab-btn.active { background: var(--main-pink); color: white; }
 
-        /* 📦 ダッシュボードグリッド（3カラム構成） */
+        /* 📦 画面切り替え管理 */
+        .view-content { display: none; }
+        .view-content.active { display: block; }
+
+        /* 📊 ダッシュボードグリッド（3カラム構成） */
         .dashboard-grid {
-            display: grid;
-            grid-template-columns: 280px 1fr 280px;
-            gap: 20px;
-            align-items: start;
+            display: grid; grid-template-columns: 300px 1fr 300px; gap: 20px; align-items: start;
         }
 
         /* 📝 ノート・カード基盤 */
         .notebook-card {
-            background-color: var(--card-bg);
-            border: 3px solid var(--soft-pink);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0 6px 12px rgba(255, 143, 169, 0.05);
+            background-color: var(--card-bg); border: 3px solid var(--soft-pink);
+            border-radius: var(--border-radius); padding: 20px;
+            box-shadow: 0 6px 12px rgba(255, 143, 169, 0.05); margin-bottom: 20px;
             position: relative;
         }
-        
-        /* カード見出し */
-        .card-title {
-            font-family: var(--font-eng);
-            font-size: 1.1rem;
-            color: var(--dark-pink);
-            margin-top: 0;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-        .card-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 15px;
-        }
+        .card-title { font-family: var(--font-eng); font-size: 1.1rem; color: var(--dark-pink); margin: 0 0 5px 0; text-align: center; }
+        .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 15px; }
 
-        /* 📊 左カラム: Progress ボックス */
-        .point-display-container {
-            text-align: center;
-            margin-bottom: 20px;
-            background-color: var(--bg-color);
-            padding: 15px;
-            border-radius: 16px;
-        }
-        .point-val {
-            font-size: 2.5rem;
-            color: var(--dark-pink);
-            font-family: var(--font-eng);
-            margin: 5px 0;
-        }
-        .study-time-val {
-            font-size: 1.1rem;
-            color: var(--text-color);
-            margin: 5px 0;
-        }
+        /* コンテナ系 */
+        .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 12px; border-radius: 16px; }
+        .point-val { font-size: 2.3rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; }
+        .study-time-val { font-size: 1.1rem; color: var(--text-color); margin: 0; }
 
         /* 進捗バー */
-        .progress-bar-bg {
-            background: #ffe3e9;
-            height: 12px;
-            border-radius: 6px;
-            width: 100%;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        .progress-bar-fill {
-            background: linear-gradient(90deg, #ff9ebb, var(--main-pink));
-            height: 100%;
-            width: 0%;
-            border-radius: 6px;
-            transition: width 0.5s ease;
-        }
+        .progress-bar-bg { background: #ffe3e9; height: 12px; border-radius: 6px; width: 100%; overflow: hidden; margin-top: 5px; }
+        .progress-bar-fill { background: linear-gradient(90deg, #ff9ebb, var(--main-pink)); height: 100%; width: 0%; border-radius: 6px; transition: width 0.5s ease; }
 
-        /* 📓 中央カラム: バインダー風ノート面 */
-        .center-notebook {
-            border-left: 12px solid #ffccd7; /* ルーズリーフの端っこ風 */
+        /* 入力フォーム・コントロール */
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        label { font-size: 0.85rem; color: var(--text-color); }
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 10px; border: 2px solid var(--soft-pink); border-radius: 12px;
+            font-family: var(--font-main); font-size: 0.9rem; color: var(--text-color); box-sizing: border-box; outline: none;
         }
+        .slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #fff; outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--main-pink); border: 2px solid #fff; cursor: pointer; }
 
-        /* 操作パネル用スライダー＆ボタン */
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .control-box {
-            background: var(--bg-color);
-            padding: 15px;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-        }
-        .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #fff;
-            outline: none;
-        }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--main-pink);
-            border: 2px solid #fff;
-            cursor: pointer;
-        }
         .btn-execute {
-            background-color: var(--main-pink);
-            color: white;
-            padding: 10px;
-            border-radius: 14px;
-            border: none;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: 700;
+            width: 100%; background-color: var(--main-pink); color: white; padding: 12px;
+            border-radius: 14px; border: none; font-size: 0.9rem; cursor: pointer; font-weight: 700;
         }
-        .btn-execute:hover {
-            background-color: var(--dark-pink);
-        }
+        .btn-execute:hover { background-color: var(--dark-pink); }
 
-        /* 📋 右カラム: 履歴ログリスト */
-        .history-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 250px;
-            overflow-y: auto;
+        /* リスト・アイテム表示 */
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .list-entry {
+            background: var(--bg-color); padding: 15px; border-radius: 14px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .history-item {
-            font-size: 0.8rem;
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--soft-pink);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-delete-log {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            opacity: 0.5;
-        }
-        .btn-delete-log:hover { opacity: 1; }
+        .entry-info { display: flex; flex-direction: column; gap: 4px; }
+        .entry-title { font-size: 0.95rem; color: var(--text-color); }
+        .entry-meta { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
+        .btn-action:hover { opacity: 1; }
 
-        /* ⚙️ 下部管理アクション */
-        .danger-zone {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0 50px 0;
-        }
-        .btn-sub {
-            background: #ffffff;
-            border: 2px solid var(--soft-pink);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            color: var(--text-color);
-            font-weight: 700;
-        }
+        /* ⚙️ 下部管理セクション */
+        .danger-zone { display: flex; justify-content: center; gap: 15px; margin: 30px 0 50px 0; }
+        .btn-sub { background: #ffffff; border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
 
-        /* 📱 レスポンシブ設計 (スマートフォン向け表示) */
+        /* 📱 スマホ向けレスポンシブ設計 */
         @media (max-width: 900px) {
-            body {
-                flex-direction: column;
-            }
-            .sidebar {
-                display: none; /* 横のサイドバーを消す */
-            }
+            body { flex-direction: column; }
+            .sidebar { display: none; }
             .bottom-nav {
-                display: flex; /* 下部のメニューバーを出す */
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+                background-color: #fffbfa; border-top: 3px solid var(--soft-pink);
+                justify-content: space-around; align-items: center; z-index: 1000;
             }
-            .main-wrapper {
-                margin-left: 0;
-                width: 100%;
-                padding: 15px 15px 80px 15px; /* 下部ナビに被らないよう余白を追加 */
-            }
-            .dashboard-grid {
-                grid-template-columns: 1fr; /* 3列から1列の縦並びに変更 */
-                gap: 15px;
-            }
+            .bottom-nav .nav-item { padding: 0; flex: 1; }
+            .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 80px 15px; }
+            .dashboard-grid { grid-template-columns: 1fr; gap: 15px; }
         }
     </style>
 </head>
@@ -423,115 +196,149 @@
     <!-- ロック画面 -->
     <div id="lock-screen">
         <div class="lock-illustration">
-            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melody">
+            <span>🌸</span>
         </div>
         <h2>ENTER PASSWORD</h2>
         <input type="password" id="pass-input">
         <button onclick="checkPassword()">Open</button>
     </div>
 
-    <!-- 🎀 サイドナビゲーション (PC表示用) -->
+    <!-- 🎀 PC用サイドメニュー -->
     <aside class="sidebar">
-        <img class="sidebar-logo" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="Icon">
         <div class="sidebar-menu">
-            <button class="nav-item active"><span class="nav-icon">🏠</span>Dashboard</button>
-            <button class="nav-item"><span class="nav-icon">📓</span>Notebook</button>
-            <button class="nav-item"><span class="nav-icon">📊</span>Goal</button>
+            <button class="nav-item active" onclick="switchView('dashboard')"><span class="nav-icon">🏠</span>Dashboard</button>
+            <button class="nav-item" onclick="switchView('rewards')"><span class="nav-icon">🎁</span>Rewards</button>
+            <button class="nav-item" onclick="switchView('goals')"><span class="nav-icon">📊</span>Goals</button>
         </div>
     </aside>
 
-    <!-- 📱 ボトムナビゲーション (スマホ表示用) -->
+    <!-- 📱 スマホ用ボトムメニュー -->
     <nav class="bottom-nav">
-        <button class="nav-item active"><span class="nav-icon">🏠</span>Dashboard</button>
-        <button class="nav-item"><span class="nav-icon">📓</span>Notebook</button>
-        <button class="nav-item"><span class="nav-icon">📊</span>Goal</button>
+        <button class="nav-item active" onclick="switchView('dashboard')"><span class="nav-icon">🏠</span>Dashboard</button>
+        <button class="nav-item" onclick="switchView('rewards')"><span class="nav-icon">🎁</span>Rewards</button>
+        <button class="nav-item" onclick="switchView('goals')"><span class="nav-icon">📊</span>Goals</button>
     </nav>
 
     <!-- メインコンテンツ -->
     <main class="main-wrapper">
         
         <!-- ヘッダー -->
-        <section class="header-section">
-            <img class="top-banner" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melodic Banner">
-            <h1 class="welcome-title">My Melodic Study Notebook</h1>
-            <p class="welcome-subtitle">ハロー！きょうも いっしょに がんばろう！</p>
-            
-            <!-- 👥 ユーザー切り替え -->
+        <header class="header-section">
             <div class="user-tabs">
                 <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
                 <button id="tab-ayaki" class="tab-btn" onclick="switchUser('ayaki')">あやき用</button>
             </div>
-        </section>
+        </header>
 
-        <!-- 3カラム/縦並び 可変グリッド -->
-        <div class="dashboard-grid">
-            
-            <!-- 📊 左カラム: Progress ボックス -->
-            <article class="notebook-card">
-                <h3 class="card-title">Study Progress</h3>
-                <p class="card-subtitle">現在の目標達成状況</p>
+        <!-- 🏠 ① ダッシュボード画面 -->
+        <div id="view-dashboard" class="view-content active">
+            <div class="dashboard-grid">
                 
-                <div class="point-display-container">
-                    <div style="font-size:0.75rem; color:var(--text-muted)">まるちぽいんと</div>
-                    <div class="point-val"><span id="points-display">0</span><span style="font-size:1rem; margin-left:4px;">pt</span></div>
-                </div>
-
-                <div class="point-display-container">
-                    <div style="font-size:0.75rem; color:var(--text-muted)">ごうけいべんきょう</div>
-                    <div class="study-time-val" id="total-study-display">0h 00m</div>
-                </div>
-
-                <div style="margin-top: 15px;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
-                        <span>今週のもくひょう (45h)</span>
-                        <span id="progress-percent-label">0%</span>
+                <!-- 左列: ステータス -->
+                <section class="notebook-card">
+                    <h3 class="card-title">Progress</h3>
+                    <p class="card-subtitle">現在の状況</p>
+                    
+                    <div class="point-display-container">
+                        <div style="font-size:0.75rem; color:var(--text-muted)">まるちぽいんと</div>
+                        <div class="point-val"><span id="dash-points">0</span><span style="font-size:1rem; margin-left:4px;">pt</span></div>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                    <div class="point-display-container">
+                        <div style="font-size:0.75rem; color:var(--text-muted)">ごうけいべんきょう時間</div>
+                        <div class="study-time-val" id="dash-study-time">0h 00m</div>
                     </div>
-                </div>
-            </article>
-
-            <!-- 📓 中央カラム: 操作ノートパネル -->
-            <article class="notebook-card center-notebook">
-                <h3 class="card-title">Mistake & Study Note</h3>
-                <p class="card-subtitle">ポイントの記録やつかう調整</p>
-
-                <div class="control-group">
-                    <!-- STUDY -->
-                    <div class="control-box">
-                        <div class="slider-header"><span>がんばった時間を選ぶ:</span><span id="study-val-label">+1 pt</span></div>
-                        <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="document.getElementById('study-val-label').innerText='+'+this.value+' pt'">
-                        <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする</button>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
+                            <span>今週のもくひょう達成率</span>
+                            <span id="dash-progress-text">0%</span>
+                        </div>
+                        <div class="progress-bar-bg"><div id="dash-progress-bar" class="progress-bar-fill"></div></div>
                     </div>
+                </section>
 
-                    <!-- REWARD -->
-                    <div class="control-box">
-                        <div class="slider-header"><span>つかうポイントを選ぶ:</span><span id="reward-val-label">-1 pt</span></div>
-                        <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="document.getElementById('reward-val-label').innerText='-'+this.value+' pt'">
-                        <button class="btn-execute" style="background-color: var(--dark-pink);" onclick="executeReward()">ポイントをつかう</button>
+                <!-- 中列: クイック勉強きろく -->
+                <section class="notebook-card">
+                    <h3 class="card-title">Quick Log</h3>
+                    <p class="card-subtitle">勉強時間をさくっと記録</p>
+                    
+                    <div class="form-group">
+                        <label>教科を選ぶ:</label>
+                        <select id="quick-subject">
+                            <option value="数学">数学</option>
+                            <option value="英語">英語</option>
+                            <option value="物理">物理</option>
+                            <option value="その他">その他</option>
+                        </select>
                     </div>
-                </div>
-            </article>
+                    <div class="form-group">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                            <label>勉強した時間:</label>
+                            <span id="quick-hours-label">1.0時間 (+1.0pt)</span>
+                        </div>
+                        <input type="range" id="quick-hours" class="slider" min="0.5" max="12" step="0.5" value="1" oninput="updateQuickLabel(this.value)">
+                    </div>
+                    <button class="btn-execute" onclick="submitQuickLog()">記録をノートに書く</button>
+                </section>
 
-            <!-- 📋 右カラム: History ログ -->
-            <article class="notebook-card">
-                <h3 class="card-title">Today's Notes</h3>
-                <p class="card-subtitle">最近のうごきの履歴</p>
-                <ul class="history-list" id="history-container"></ul>
-            </article>
+                <!-- 右列: 最近のうごき -->
+                <section class="notebook-card">
+                    <h3 class="card-title">Activity Log</h3>
+                    <p class="card-subtitle">最新の履歴ログ</p>
+                    <ul class="item-list" id="dash-history-list" style="max-height: 280px; overflow-y: auto;"></ul>
+                </section>
 
+            </div>
         </div>
 
-        <!-- 管理エリア -->
-        <div class="danger-zone">
-            <button class="btn-sub" onclick="alert('バックアップ機能はデータ連携後に利用できます')">データ復元</button>
-            <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">データの初期化</button>
+        <!-- 🎁 ② ご褒美ストア画面 -->
+        <div id="view-rewards" class="view-content">
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
+                <!-- 左側: ご褒美追加 -->
+                <section class="notebook-card">
+                    <h3 class="card-title">Create Reward</h3>
+                    <p class="card-subtitle">新しいご褒美をつくる</p>
+                    <div class="form-group">
+                        <label>ご褒美の名前:</label>
+                        <input type="text" id="reward-name" placeholder="例: スマホゲーム30分">
+                    </div>
+                    <div class="form-group">
+                        <label>ひつようなポイント:</label>
+                        <input type="number" id="reward-cost" min="1" value="5">
+                    </div>
+                    <button class="btn-execute" onclick="submitRewardItem()">ストアへ並べる</button>
+                </section>
+                <!-- 右側: 交換所 -->
+                <section class="notebook-card">
+                    <h3 class="card-title">Reward Shop</h3>
+                    <p class="card-subtitle">ポイントをつかって交換しよう！ (所持: <span id="shop-points" style="color:var(--dark-pink)">0</span>pt)</p>
+                    <div id="shop-container" class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:15px;"></div>
+                </section>
+            </div>
         </div>
+
+        <!-- 📊 ③ 目標設定画面 (復活) -->
+        <div id="view-goals" class="view-content">
+            <section class="notebook-card" style="max-width: 500px; margin: 0 auto;">
+                <h3 class="card-title">Goal Settings</h3>
+                <p class="card-subtitle">今週の目標勉強時間をきめる</p>
+                <div class="form-group">
+                    <label>目標時間 (時間単位):</label>
+                    <input type="number" id="input-goal-hours" min="1" value="45">
+                </div>
+                <button class="btn-execute" onclick="submitGoalSettings()">目標時間をほぞんする</button>
+            </section>
+        </div>
+
+        <!-- ⚙️ バックアップ等管理 -->
+        <footer class="danger-zone">
+            <button class="btn-sub" onclick="alert('データ連携完了後に自動保存されます')">データ同期</button>
+            <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">全データの初期化</button>
+        </footer>
+
     </main>
 
     <script>
-        // Firebaseのコンフィグレーション
+        // Firebase構成設定
         const firebaseConfig = {
             apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
             authDomain: "gohoubipt.firebaseapp.com",
@@ -543,11 +350,11 @@
             measurementId: "G-DRQR6ZJQLE"
         };
 
-        const SECRET_PASSWORD = "ayu"; 
-        const GOAL_HOURS = 45; 
+        const SECRET_PASSWORD = "ayu";
         let db;
-        let currentUser = 'ayu'; 
+        let currentUser = 'ayu';
         let currentPoints = 0;
+        let currentGoal = 45;
         let dbListenerRef = null;
 
         function checkPassword() {
@@ -555,7 +362,6 @@
             if (inputEl.value === SECRET_PASSWORD) {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
-                
                 document.getElementById("lock-screen").style.opacity = "0";
                 setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500);
                 startListening();
@@ -563,6 +369,16 @@
                 alert("パスワードがちがいます！");
                 inputEl.value = "";
             }
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
         }
 
         function switchUser(userKey) {
@@ -577,110 +393,168 @@
         function startListening() {
             dbListenerRef = db.ref(`data/${currentUser}`);
             dbListenerRef.on("value", (snapshot) => {
-                const content = snapshot.val();
-                if (content) {
-                    currentPoints = content.points || 0;
-                    renderUI(currentPoints, content.history || {});
-                } else {
-                    db.ref(`data/${currentUser}`).set({ points: 0, history: { "init": { date: new Date().toLocaleDateString('ja-JP'), action: "初期登録", points: 0, timestamp: Date.now() } } });
-                }
+                const data = snapshot.val() || {};
+                currentPoints = data.points || 0;
+                currentGoal = data.goalHours || 45;
+
+                document.getElementById("input-goal-hours").value = currentGoal;
+                document.getElementById("dash-points").innerText = currentPoints;
+                document.getElementById("shop-points").innerText = currentPoints;
+
+                renderHistory(data.history || {});
+                renderRewards(data.rewardStore || {});
             });
         }
 
-        function renderUI(points, historyMap) {
-            document.getElementById("points-display").innerText = points;
-            const historyList = Object.keys(historyMap).map(key => ({ key, ...historyMap[key] }));
+        function updateQuickLabel(val) {
+            document.getElementById('quick-hours-label').innerText = `${val}時間 (+${val}pt)`;
+        }
+
+        function submitQuickLog() {
+            const subject = document.getElementById("quick-subject").value;
+            const hours = parseFloat(document.getElementById("quick-hours").value);
             
-            // 勉強時間集計
-            let totalMinutes = 0;
-            let weeklyMinutes = 0;
-            const startOfWeek = new Date();
-            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-            startOfWeek.setHours(0,0,0,0);
-
-            historyList.forEach(item => {
-                if (item.action.includes('学習')) {
-                    const match = item.action.match(/学習（([\d.]+)h加算）/);
-                    if (match) {
-                        const mins = parseFloat(match[1]) * 60;
-                        totalMinutes += mins;
-                        if ((item.timestamp || 0) >= startOfWeek.getTime()) weeklyMinutes += mins;
-                    }
-                }
-            });
-
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = Math.floor(totalMinutes % 60);
-            document.getElementById("total-study-display").innerText = `${hours}h ${minutes < 10 ? '0' + minutes : minutes}m`;
-
-            let percent = Math.floor(((weeklyMinutes / 60) / GOAL_HOURS) * 100);
-            if (percent > 100) percent = 100;
-            document.getElementById("progress-bar-fill").style.width = `${percent}%`;
-            document.getElementById("progress-percent-label").innerText = `${percent}%`;
-
-            // 履歴表示
-            const container = document.getElementById("history-container");
-            container.innerHTML = "";
-            [...historyList].reverse().forEach(item => {
-                if (item.key === "init") return;
-                const li = document.createElement("li");
-                li.className = "history-item";
-                li.innerHTML = `
-                    <div><div>${item.action}</div><small style="color:var(--text-muted)">${item.date}</small></div>
-                    <div><span style="color:var(--dark-pink); font-family:var(--font-eng); margin-right:8px">${item.points > 0 ? '+' : ''}${item.points}pt</span>
-                    <button class="btn-delete-log" onclick="deleteHistoryItem('${item.key}')">🗑️</button></div>
-                `;
-                container.appendChild(li);
-            });
-        }
-
-        function updatePoints(amount, actionName) {
-            if (amount < 0 && currentPoints + amount < 0) {
-                alert("ポイントがたりません！");
-                return;
-            }
-            const newKey = db.ref().child(`data/${currentUser}/history`).push().key;
+            const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
             db.ref(`data/${currentUser}`).transaction(data => {
                 if (data) {
-                    data.points = (data.points || 0) + amount;
+                    data.points = (data.points || 0) + hours;
                     if (!data.history) data.history = {};
-                    data.history[newKey] = { date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: actionName, points: amount };
+                    data.history[newLogKey] = {
+                        date: new Date().toLocaleDateString('ja-JP'),
+                        timestamp: Date.now(),
+                        action: `学習：${subject} (${hours}h)`,
+                        points: hours
+                    };
                 }
                 return data;
             });
         }
 
-        function executeStudy() {
-            const val = parseFloat(document.getElementById("study-range").value);
-            updatePoints(val, `学習（${val}h加算）`);
-        }
+        function renderHistory(historyMap) {
+            const container = document.getElementById("dash-history-list");
+            container.innerHTML = "";
+            const list = Object.keys(historyMap).map(k => ({key: k, ...historyMap[k]}));
+            
+            let totalMins = 0;
+            let weeklyMins = 0;
+            const startOfWeek = new Date();
+            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+            startOfWeek.setHours(0,0,0,0);
 
-        function executeReward() {
-            const val = parseInt(document.getElementById("reward-range").value, 10);
-            updatePoints(-val, `ご褒美使用 (-${val}pt)`);
-        }
-
-        function deleteHistoryItem(itemKey) {
-            db.ref(`data/${currentUser}/history/${itemKey}`).once("value").then(snap => {
-                const item = snap.val();
-                if (!item) return;
-                if (currentPoints - item.points < 0) {
-                    alert("この履歴を消すとポイントがマイナスになってしまいます！");
-                    return;
+            list.forEach(item => {
+                if(item.action.includes('学習')) {
+                    const match = item.action.match(/([\d.]+)h/);
+                    if(match) {
+                        const mins = parseFloat(match[1]) * 60;
+                        totalMins += mins;
+                        if((item.timestamp || 0) >= startOfWeek.getTime()) weeklyMins += mins;
+                    }
                 }
+            });
+
+            const h = Math.floor(totalMins / 60);
+            const m = Math.floor(totalMins % 60);
+            document.getElementById("dash-study-time").innerText = `${h}h ${m < 10 ? '0'+m : m}m`;
+
+            let p = Math.floor(((weeklyMins/60) / currentGoal) * 100);
+            if(p > 100) p = 100;
+            document.getElementById("dash-progress-bar").style.width = `${p}%`;
+            document.getElementById("dash-progress-text").innerText = `${p}%`;
+
+            list.reverse().forEach(item => {
+                const li = document.createElement("li");
+                li.className = "list-entry";
+                li.innerHTML = `
+                    <div class="entry-info"><span class="entry-title">${item.action}</span><span class="entry-meta">${item.date}</span></div>
+                    <div><span style="color:var(--dark-pink); margin-right:8px;">${item.points > 0 ? '+' : ''}${item.points}pt</span>
+                    <button class="btn-action" onclick="deleteHistory('${item.key}')">🗑️</button></div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function deleteHistory(key) {
+            db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => {
+                const item = snap.val();
+                if(!item) return;
+                if(currentPoints - item.points < 0) { alert("所持ポイントがマイナスになるため削除できません！"); return; }
                 db.ref(`data/${currentUser}`).transaction(data => {
                     if (data) {
                         data.points -= item.points;
-                        if (data.history) delete data.history[itemKey];
+                        if(data.history) delete data.history[key];
                     }
                     return data;
                 });
             });
         }
 
+        function submitRewardItem() {
+            const name = document.getElementById("reward-name").value.trim();
+            const cost = parseInt(document.getElementById("reward-cost").value, 10);
+            if(!name || isNaN(cost) || cost <= 0) { alert("ご褒美名と正しいポイントを入力してね！"); return; }
+
+            const newKey = db.ref().child(`data/${currentUser}/rewardStore`).push().key;
+            db.ref(`data/${currentUser}/rewardStore/${newKey}`).set({ name, cost }).then(() => {
+                document.getElementById("reward-name").value = "";
+                document.getElementById("reward-cost").value = 5;
+            });
+        }
+
+        function renderRewards(storeMap) {
+            const container = document.getElementById("shop-container");
+            container.innerHTML = "";
+            Object.keys(storeMap).forEach(key => {
+                const item = storeMap[key];
+                const card = document.createElement("div");
+                card.className = "notebook-card";
+                card.style.textAlign = "center";
+                card.style.padding = "15px";
+                card.innerHTML = `
+                    <div style="font-size:0.95rem; margin-bottom:8px;">${item.name}</div>
+                    <div style="font-size:1.1rem; color:var(--dark-pink); font-family:var(--font-eng); margin-bottom:10px;">${item.cost} pt</div>
+                    <button class="btn-execute" style="padding:6px; font-size:0.8rem;" onclick="exchangeReward('${item.name}', ${item.cost})">交換する</button>
+                    <button class="btn-action" style="position:absolute; top:5px; right:5px; font-size:0.8rem;" onclick="deleteRewardStoreItem('${key}')">✕</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function exchangeReward(name, cost) {
+            if(currentPoints < cost) { alert("ポイントが足りません！"); return; }
+            if(!confirm(`「${name}」を ${cost}pt で交換しますか？`)) return;
+
+            const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
+            db.ref(`data/${currentUser}`).transaction(data => {
+                if (data) {
+                    data.points = (data.points || 0) - cost;
+                    if (!data.history) data.history = {};
+                    data.history[newLogKey] = {
+                        date: new Date().toLocaleDateString('ja-JP'),
+                        timestamp: Date.now(),
+                        action: `交換：${name}`,
+                        points: -cost
+                    };
+                }
+                return data;
+            });
+        }
+
+        function deleteRewardStoreItem(key) {
+            if(confirm("このご褒美アイテムをストアから削除しますか？")) db.ref(`data/${currentUser}/rewardStore/${key}`).remove();
+        }
+
+        function submitGoalSettings() {
+            const hours = parseInt(document.getElementById("input-goal-hours").value, 10);
+            if(isNaN(hours) || hours <= 0) { alert("正しい目標時間を入力してね！"); return; }
+            db.ref(`data/${currentUser}/goalHours`).set(hours).then(() => {
+                alert("目標時間を変更しました！");
+                switchView('dashboard');
+            });
+        }
+
         function triggerResetFlow() {
-            if (confirm("本当に初期化しますか？履歴がすべて消去されます。")) {
-                db.ref(`data/${currentUser}`).remove().then(() => alert("初期化しました。"));
+            if(confirm("注意！現在のユーザーのすべてのデータ（ポイント、履歴）が完全に初期化されます。本当によろしいですか？")) {
+                db.ref(`data/${currentUser}`).remove().then(() => alert("初期化が完了しました。"));
             }
         }
     </script>
