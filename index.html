@@ -49,10 +49,10 @@
             margin: 20px auto 80px auto;
         }
 
-        /* 🎀 マイメロディ ヘッダーバナー（お気に入りの画像を設定） */
+        /* 🎀 マイメロディ ヘッダーバナー */
         .character-banner {
             width: 100%;
-            height: 180px; /* 画像がきれいに見えるように高さを調整 */
+            height: 200px; /* 新しい画像に合わせて高さを最適化 */
             background-color: #ffffff;
             border-radius: 24px;
             margin-bottom: 20px;
@@ -66,7 +66,7 @@
         .character-banner img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* キャラクターが切れないように綺麗に収めます */
+            object-fit: contain;
             background: #ffffff;
         }
 
@@ -74,7 +74,7 @@
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffeef2;
+            background: linear-gradient(135deg, #ffeef2 0%, #ffdee6 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -84,61 +84,68 @@
         }
 
         .lock-illustration {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             background: #ffffff;
             border-radius: 50%;
-            margin-bottom: 25px;
-            border: 3px solid #ffb7ca;
+            margin-bottom: 20px;
+            border: 4px solid #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 8px 20px rgba(255, 143, 169, 0.2);
             overflow: hidden;
         }
         .lock-illustration img {
-            width: 90%;
-            height: 90%;
+            width: 85%;
+            height: 85%;
             object-fit: contain;
         }
 
         #lock-screen h2 {
-            font-size: 1rem;
-            color: #ff7597;
-            margin-bottom: 25px;
-            font-family: 'Mochiy Pop One', sans-serif;
-            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+            color: #ff6b8b;
+            margin-bottom: 20px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            letter-spacing: 0.1em;
+            font-weight: 700;
         }
 
         #lock-screen input {
             background: #ffffff;
-            border: 2px solid #ffb7ca;
-            border-radius: 20px;
-            padding: 12px;
+            border: none;
+            border-radius: 24px;
+            padding: 14px;
             font-size: 1.4rem;
-            width: 200px;
+            width: 220px;
             text-align: center;
             outline: none;
             letter-spacing: 0.2em;
-            margin-bottom: 30px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            margin-bottom: 25px;
+            box-shadow: 0 6px 15px rgba(255, 183, 202, 0.2);
             color: var(--text-color);
+            transition: box-shadow 0.3s;
+        }
+        
+        #lock-screen input:focus {
+            box-shadow: 0 6px 20px rgba(255, 117, 151, 0.3);
         }
 
         #lock-screen button {
             background-color: #ff7597;
             color: white;
             border: none;
-            padding: 14px 50px;
-            border-radius: 30px;
+            padding: 14px 60px;
+            border-radius: 24px;
             font-size: 0.9rem;
             cursor: pointer;
-            box-shadow: 0 6px 14px rgba(255, 117, 151, 0.3);
-            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 6px 16px rgba(255, 117, 151, 0.3);
+            transition: transform 0.2s, background-color 0.2s;
+            font-weight: 700;
         }
         #lock-screen button:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
+            transform: scale(1.03);
+            background-color: #ff5c83;
         }
 
         /* 👥 切り替えタブ */
@@ -582,12 +589,12 @@
     <!-- ロック画面 -->
     <div id="lock-screen">
         <div class="lock-illustration">
-            <!-- 🍓 ロック画面のマイメロディ画像 -->
-            <img src="https://www.sanrio.co.jp/assets/img/characters/mymelody/mymelody_icon.png" alt="My Melody">
+            <!-- 🎀 ロック画面のマイメロディ画像もお気に入りのイラストに統一 -->
+            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melody">
         </div>
         <h2>ENTER PASSWORD</h2>
         <input type="password" id="pass-input">
-        <button onclick="checkPassword()">ひらく 🍓</button>
+        <button onclick="checkPassword()">ひらく</button>
     </div>
 
     <!-- 🔒 確認モーダル -->
@@ -634,9 +641,9 @@
     <!-- メインコンテンツ -->
     <div class="container">
         
-        <!-- 🎀 キャラクター画像ヘッダー（あやきさんお気に入りのイラストを設定！） -->
+        <!-- 🎀 キャラクター画像ヘッダー（新しいお気に入りデザインギャラリーの画像！） -->
         <div class="character-banner">
-            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png" alt="My Melody Banner">
+            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melody Banner">
         </div>
 
         <!-- 👥 ユーザー切り替えタブ -->
@@ -648,14 +655,14 @@
         <!-- 📊 統計表示 -->
         <div class="stats-grid">
             <div class="point-box">
-                <div class="point-title">🍓 まるちぽいんと</div>
+                <div class="point-title">まるちぽいんと</div>
                 <div class="point-value">
                     <span id="points-display">0</span>
                     <span class="point-unit">pt</span>
                 </div>
             </div>
             <div class="point-box">
-                <div class="point-title">🕒 ごうけいべんきょう</div>
+                <div class="point-title">ごうけいべんきょう</div>
                 <div class="point-value" style="font-size: 2rem; margin-top: 14px;">
                     <span id="total-study-display">0h 00m</span>
                 </div>
@@ -665,7 +672,7 @@
         <!-- 週次目標プログレスバー -->
         <div class="progress-container">
             <div class="progress-header">
-                <span>🎀 今週のもくひょう (45h/Week)</span>
+                <span>今週のもくひょう (45h/Week)</span>
                 <span id="progress-percent-label">0%</span>
             </div>
             <div class="progress-bar-bg">
@@ -676,48 +683,48 @@
         <!-- コントロールパネル -->
         <div class="admin-panel-grid">
             <!-- STUDY -->
-            <div class="section-label">🐾 STUDY (おべんきょう)</div>
+            <div class="section-label">STUDY (おべんきょう)</div>
             <div class="control-box">
                 <div class="slider-header">
                     <span class="slider-title">がんばった時間をえらぶ:</span>
                     <span id="study-val-label" class="val-badge val-badge-study">+1 pt</span>
                 </div>
                 <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="updateStudyLabel(this.value)">
-                <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする 🍓</button>
+                <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする</button>
             </div>
 
             <!-- REWARD -->
-            <div class="section-label">🎈 REWARD (ごほうび)</div>
+            <div class="section-label">REWARD (ごほうび)</div>
             <div class="control-box">
                 <div class="slider-header">
                     <span class="slider-title">つかうポイントをえらぶ:</span>
                     <span id="reward-val-label" class="val-badge val-badge-reward">-1 pt</span>
                 </div>
                 <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="updateRewardLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--accent-pink);" onclick="executeReward()">ポイントをつかう 🎀</button>
+                <button class="btn-execute" style="background-color: var(--accent-pink);" onclick="executeReward()">ポイントをつかう</button>
             </div>
 
             <!-- ADJUST -->
-            <div class="section-label">🩹 ADJUST (ちょうせい)</div>
+            <div class="section-label">ADJUST (ちょうせい)</div>
             <div class="control-box">
                 <div class="slider-header">
                     <span class="slider-title">まちがえて記録したとき:</span>
                     <span id="adjust-val-label" class="val-badge val-badge-adjust">-0.5 pt</span>
                 </div>
                 <input type="range" id="adjust-range" class="slider" min="0.5" max="5" step="0.5" value="0.5" oninput="updateAdjustLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">まちがいを減らす 🩹</button>
+                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">まちがいを減らす</button>
             </div>
         </div>
 
         <!-- 履歴表示 -->
         <div class="history-box">
-            <h3 class="history-title">🐾 こんどのきろく (Log History)</h3>
+            <h3 class="history-title">こんどのきろく (Log History)</h3>
             <ul class="history-list" id="history-container"></ul>
         </div>
 
         <!-- セーフティ領域 -->
         <div class="danger-zone">
-            <button class="btn-secondary-action" onclick="openPasswordModal('backup')">💾 バックアップを復元する</button>
+            <button class="btn-secondary-action" onclick="openPasswordModal('backup')">バックアップを復元する</button>
             <button class="btn-danger" onclick="triggerResetFlow()">システム全体の完全初期化</button>
         </div>
     </div>
@@ -823,11 +830,11 @@
         function calculateTotalStudyMinutes(historyArray) {
             let totalMinutes = 0;
             historyArray.forEach(item => {
-                if (item.action === '30分勉強') {
+                if (item.action === '30分勉強' || item.action === '30分おべんきょう') {
                     totalMinutes += 30;
-                } else if (item.action === '1時間勉強') {
+                } else if (item.action === '1時間勉強' || item.action === '1時間おべんきょう') {
                     totalMinutes += 60;
-                } else if (item.action === '3時間勉強') {
+                } else if (item.action === '3時間勉強' || item.action === '3時間おべんきょう') {
                     totalMinutes += 180;
                 } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
                     const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
@@ -853,11 +860,11 @@
                 const itemTime = item.timestamp ? item.timestamp : new Date(item.date).getTime();
                 
                 if (itemTime >= startOfWeekTime) {
-                    if (item.action === '30分勉強') {
+                    if (item.action === '30分勉強' || item.action === '30分おべんきょう') {
                         weeklyMinutes += 30;
-                    } else if (item.action === '1時間勉強') {
+                    } else if (item.action === '1時間勉強' || item.action === '1時間おべんきょう') {
                         weeklyMinutes += 60;
-                    } else if (item.action === '3時間勉強') {
+                    } else if (item.action === '3時間勉強' || item.action === '3時間おべんきょう') {
                         weeklyMinutes += 180;
                     } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
                         const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
@@ -998,7 +1005,7 @@
 
                 const now = new Date();
                 const userName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
-                const labelSuffix = isResetting ? ` (${targetName}初期化直前)` : ` (${userName}自動保存)`;
+                const labelSuffix = isResetting ? ` (初期化直前)` : ` (${userName}自動保存)`;
                 const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
                 
                 const backupData = {
@@ -1120,7 +1127,6 @@
             resetSlider("adjust-range", 0.5, "adjust-val-label", "-0.5 pt");
         }
 
-        // スライダーのリセット処理
         function resetSlider(sliderId, defaultValue, badgeId, defaultBadgeText) {
             const slider = document.getElementById(sliderId);
             if (slider) slider.value = defaultValue;
