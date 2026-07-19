@@ -539,33 +539,43 @@
             if(!periodEl) return;
             const daysToLookBack = parseInt(periodEl.value, 10);
             
-            // 今日の終わりの時間を基準にする
             const now = new Date();
             now.setHours(23, 59, 59, 999);
             const timeLimit = now.getTime() - (daysToLookBack * 24 * 60 * 60 * 1000);
             
             let dateMap = {}; let catMap = {};
             
-            // X軸のラベル（過去〇日分）を空で作っておく
             for(let i = daysToLookBack - 1; i >= 0; i--) {
                 let d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
                 dateMap[`${d.getMonth()+1}/${d.getDate()}`] = 0;
             }
 
-            // 履歴データから学習記録だけを抽出
             Object.keys(globalHistoryData).forEach(key => {
                 const item = globalHistoryData[key];
                 if(item.action && item.action.includes('学習')) {
-                    // 古いデータでtimestampがない場合はdateから推測する
                     let ts = item.timestamp;
                     if(!ts && item.date) ts = new Date(item.date).getTime();
                     
                     if(ts >= timeLimit) {
-                        const matchTime = item.action.match(/([\d.]+)h/);
+                        // 🎀 どんな形式の「学習」ログからでも時間を抜き出せるようにパワーアップ
+                        let h = 0;
+                        const matchFormat1 = item.action.match(/([\d.]+)h/);      // 「(1.0h)」や「(1.0h加算)」に対応
+                        const matchFormat2 = item.action.match(/（([\d.]+)h加算）/); // 全角の「（1.0h加算）」に対応
+                        
+                        if (matchFormat1) {
+                            h = parseFloat(matchFormat1[1]);
+                        } else if (matchFormat2) {
+                            h = parseFloat(matchFormat2[1]);
+                        }
+
+                        // 科目名の切り出し
+                        let cat = "勉強";
                         const matchCat = item.action.match(/学習：(.+?)\s*\(/);
-                        if(matchTime && matchCat) {
-                            const h = parseFloat(matchTime[1]);
-                            const cat = matchCat[1];
+                        if(matchCat) {
+                            cat = matchCat[1];
+                        }
+
+                        if(h > 0) {
                             const d = new Date(ts);
                             const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
                             
@@ -577,6 +587,49 @@
                     }
                 }
             });
+
+            const isDark = document.body.classList.contains('dark-mode');
+            const textColor = isDark ? '#fce4e8' : '#5a4b4e';
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            const barColor = isDark ? '#e07b9e' : '#ff8fa9';
+            const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
+
+            const barCtx = document.getElementById('barChart');
+            if(barCtx) {
+                if(barChartInstance) barChartInstance.destroy();
+                barChartInstance = new Chart(barCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(dateMap),
+                        datasets: [{ label: '学習時間 (h)', data: Object.values(dateMap), backgroundColor: barColor, borderRadius: 4 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } },
+                        plugins: { legend: { labels: { color: textColor } } }
+                    }
+                });
+            }
+
+            const pieCtx = document.getElementById('pieChart');
+            if(pieCtx) {
+                if(pieChartInstance) pieChartInstance.destroy();
+                const catLabels = Object.keys(catMap);
+                const catData = Object.values(catMap);
+                
+                pieChartInstance = new Chart(pieCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels.length > 0 ? catLabels : ["データなし"],
+                        datasets: [{ data: catData.length > 0 ? catData : [1], backgroundColor: catData.length > 0 ? pieColors : ['rgba(0,0,0,0.1)'], borderWidth: 0 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { color: textColor } } }
+                    }
+                });
+            }
+        }
 
             // ダークモードに応じた色の切り替え
             const isDark = document.body.classList.contains('dark-mode');
