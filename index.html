@@ -41,7 +41,11 @@
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #ffeef2 0%, #ffdee6 100%);
+            /* ログイン画面の背景画像を設定 */
+            background-image: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -49,6 +53,15 @@
             z-index: 2000;
             transition: opacity 0.5s ease;
         }
+        /* 背景画像の上に白っぽいフィルターを重ねて見やすくする */
+        #lock-screen::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 238, 242, 0.85); /* ピンクがかった白 */
+            z-index: -1;
+        }
+
         .lock-illustration {
             width: 140px; height: 140px;
             background: #ffffff; border-radius: 50%;
@@ -65,6 +78,7 @@
             background: #ffffff; border: 2px solid var(--soft-pink);
             border-radius: 24px; padding: 12px; font-size: 1.2rem;
             width: 200px; text-align: center; outline: none; margin-bottom: 20px;
+            color: var(--text-color);
         }
         #lock-screen button {
             background-color: var(--main-pink); color: white; border: none;
@@ -72,32 +86,39 @@
             cursor: pointer; font-weight: 700;
         }
 
-        /* 🎀 ナビゲーション */
+        /* 🎀 ナビゲーション (アイコン画像化と日本語化) */
         .sidebar {
-            width: 90px; background-color: #fffbfa; border-right: 3px solid var(--soft-pink);
+            width: 110px; background-color: #fffbfa; border-right: 3px solid var(--soft-pink);
             display: flex; flex-direction: column; align-items: center; padding-top: 20px;
             position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
         }
-        .sidebar-menu { display: flex; flex-direction: column; gap: 20px; width: 100%; margin-top: 20px; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 15px; width: 100%; margin-top: 20px; }
         
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
             background: transparent; border: none; cursor: pointer;
-            color: var(--text-muted); font-family: var(--font-eng);
-            font-size: 0.65rem; font-weight: 600; gap: 4px; padding: 10px 0;
+            color: var(--text-muted); font-size: 0.75rem; font-weight: 700; gap: 8px; padding: 15px 0;
             transition: all 0.2s;
+            width: 100%;
         }
         .nav-item.active, .nav-item:hover {
             color: var(--dark-pink); background-color: #ffeef2;
-            border-radius: 12px; margin: 0 8px;
+            border-radius: 12px; width: calc(100% - 16px); margin: 0 8px;
         }
-        .nav-icon { font-size: 1.4rem; }
+        /* アイコン画像を丸く表示 */
+        .nav-icon-img {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--soft-pink);
+            object-fit: cover;
+            background-color: white;
+        }
         .bottom-nav { display: none; }
 
         /* 🏠 メインレイアウト */
         .main-wrapper {
-            margin-left: 90px; flex: 1; display: flex; flex-direction: column;
-            padding: 20px; box-sizing: border-box; width: calc(100% - 90px);
+            margin-left: 110px; flex: 1; display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box; width: calc(100% - 110px);
         }
 
         /* 👑 ヘッダーエリア */
@@ -181,42 +202,62 @@
             body { flex-direction: column; }
             .sidebar { display: none; }
             .bottom-nav {
-                display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
                 background-color: #fffbfa; border-top: 3px solid var(--soft-pink);
                 justify-content: space-around; align-items: center; z-index: 1000;
             }
-            .bottom-nav .nav-item { padding: 0; flex: 1; }
-            .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 80px 15px; }
+            .bottom-nav .nav-item { padding: 0; flex: 1; height: 100%; }
+            .main-wrapper { margin-left: 0; width: 100%; padding: 15px 15px 90px 15px; }
             .dashboard-grid { grid-template-columns: 1fr; gap: 15px; }
+            .nav-icon-img { width: 45px; height: 45px; }
+            .nav-item.active, .nav-item:hover { border-radius: 0; width: 100%; margin: 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ロック画面 -->
+    <!-- ロック画面 (背景と絵文字を修正) -->
     <div id="lock-screen">
         <div class="lock-illustration">
-            <span>🌸</span>
+            <span>🍀</span>
         </div>
         <h2>ENTER PASSWORD</h2>
         <input type="password" id="pass-input">
         <button onclick="checkPassword()">Open</button>
     </div>
 
-    <!-- 🎀 PC用サイドメニュー -->
+    <!-- 🎀 PC用サイドメニュー (アイコンと文字を修正) -->
     <aside class="sidebar">
         <div class="sidebar-menu">
-            <button class="nav-item active" onclick="switchView('dashboard')"><span class="nav-icon">🏠</span>Dashboard</button>
-            <button class="nav-item" onclick="switchView('rewards')"><span class="nav-icon">🎁</span>Rewards</button>
-            <button class="nav-item" onclick="switchView('goals')"><span class="nav-icon">📊</span>Goals</button>
+            <button class="nav-item active" onclick="switchView('dashboard')">
+                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png" alt="ダッシュボード">
+                ダッシュボード
+            </button>
+            <button class="nav-item" onclick="switchView('rewards')">
+                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png" alt="ご褒美ストア">
+                ご褒美ストア
+            </button>
+            <button class="nav-item" onclick="switchView('goals')">
+                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="目標設定">
+                目標設定
+            </button>
         </div>
     </aside>
 
-    <!-- 📱 スマホ用ボトムメニュー -->
+    <!-- 📱 スマホ用ボトムメニュー (アイコンと文字を修正) -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchView('dashboard')"><span class="nav-icon">🏠</span>Dashboard</button>
-        <button class="nav-item" onclick="switchView('rewards')"><span class="nav-icon">🎁</span>Rewards</button>
-        <button class="nav-item" onclick="switchView('goals')"><span class="nav-icon">📊</span>Goals</button>
+        <button class="nav-item active" onclick="switchView('dashboard')">
+            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png" alt="ダッシュボード">
+            ダッシュボード
+        </button>
+        <button class="nav-item" onclick="switchView('rewards')">
+            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png" alt="ご褒美ストア">
+            ご褒美ストア
+        </button>
+        <button class="nav-item" onclick="switchView('goals')">
+            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="目標設定">
+            目標設定
+        </button>
     </nav>
 
     <!-- メインコンテンツ -->
@@ -230,13 +271,13 @@
             </div>
         </header>
 
-        <!-- 🏠 ① ダッシュボード画面 -->
+        <!-- 🏠 ① ダッシュボード画面 (テキストを日本語化) -->
         <div id="view-dashboard" class="view-content active">
             <div class="dashboard-grid">
                 
                 <!-- 左列: ステータス -->
                 <section class="notebook-card">
-                    <h3 class="card-title">Progress</h3>
+                    <h3 class="card-title">進捗状況</h3>
                     <p class="card-subtitle">現在の状況</p>
                     
                     <div class="point-display-container">
@@ -258,7 +299,7 @@
 
                 <!-- 中列: クイック勉強きろく -->
                 <section class="notebook-card">
-                    <h3 class="card-title">Quick Log</h3>
+                    <h3 class="card-title">勉強記録</h3>
                     <p class="card-subtitle">勉強時間をさくっと記録</p>
                     
                     <div class="form-group">
@@ -282,7 +323,7 @@
 
                 <!-- 右列: 最近のうごき -->
                 <section class="notebook-card">
-                    <h3 class="card-title">Activity Log</h3>
+                    <h3 class="card-title">活動履歴</h3>
                     <p class="card-subtitle">最新の履歴ログ</p>
                     <ul class="item-list" id="dash-history-list" style="max-height: 280px; overflow-y: auto;"></ul>
                 </section>
@@ -290,12 +331,12 @@
             </div>
         </div>
 
-        <!-- 🎁 ② ご褒美ストア画面 -->
+        <!-- 🎁 ② ご褒美ストア画面 (テキストを日本語化) -->
         <div id="view-rewards" class="view-content">
             <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
                 <!-- 左側: ご褒美追加 -->
                 <section class="notebook-card">
-                    <h3 class="card-title">Create Reward</h3>
+                    <h3 class="card-title">ご褒美作成</h3>
                     <p class="card-subtitle">新しいご褒美をつくる</p>
                     <div class="form-group">
                         <label>ご褒美の名前:</label>
@@ -309,17 +350,17 @@
                 </section>
                 <!-- 右側: 交換所 -->
                 <section class="notebook-card">
-                    <h3 class="card-title">Reward Shop</h3>
+                    <h3 class="card-title">ご褒美ストア</h3>
                     <p class="card-subtitle">ポイントをつかって交換しよう！ (所持: <span id="shop-points" style="color:var(--dark-pink)">0</span>pt)</p>
                     <div id="shop-container" class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:15px;"></div>
                 </section>
             </div>
         </div>
 
-        <!-- 📊 ③ 目標設定画面 (復活) -->
+        <!-- 📊 ③ 目償設定画面 (目標設定に修正) -->
         <div id="view-goals" class="view-content">
             <section class="notebook-card" style="max-width: 500px; margin: 0 auto;">
-                <h3 class="card-title">Goal Settings</h3>
+                <h3 class="card-title">目標設定</h3>
                 <p class="card-subtitle">今週の目標勉強時間をきめる</p>
                 <div class="form-group">
                     <label>目標時間 (時間単位):</label>
@@ -329,7 +370,7 @@
             </section>
         </div>
 
-        <!-- ⚙️ バックアップ等管理 -->
+        <!-- ⚙️ バックアップ等管理 (テキストを日本語化) -->
         <footer class="danger-zone">
             <button class="btn-sub" onclick="alert('データ連携完了後に自動保存されます')">データ同期</button>
             <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">全データの初期化</button>
@@ -375,6 +416,7 @@
             document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${viewName}`).classList.add('active');
             
+            // PCメニューとスマホメニューの両方を更新
             document.querySelectorAll('.nav-item').forEach(btn => {
                 if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active');
                 else btn.classList.remove('active');
@@ -397,9 +439,15 @@
                 currentPoints = data.points || 0;
                 currentGoal = data.goalHours || 45;
 
-                document.getElementById("input-goal-hours").value = currentGoal;
-                document.getElementById("dash-points").innerText = currentPoints;
-                document.getElementById("shop-points").innerText = currentPoints;
+                // 各画面のポイント・目標表示を更新
+                const pointsElems = ['dash-points', 'shop-points'];
+                pointsElems.forEach(id => {
+                    const elem = document.getElementById(id);
+                    if(elem) elem.innerText = currentPoints;
+                });
+                
+                const goalInput = document.getElementById("input-goal-hours");
+                if(goalInput) goalInput.value = currentGoal;
 
                 renderHistory(data.history || {});
                 renderRewards(data.rewardStore || {});
@@ -432,6 +480,7 @@
 
         function renderHistory(historyMap) {
             const container = document.getElementById("dash-history-list");
+            if(!container) return;
             container.innerHTML = "";
             const list = Object.keys(historyMap).map(k => ({key: k, ...historyMap[k]}));
             
@@ -454,12 +503,15 @@
 
             const h = Math.floor(totalMins / 60);
             const m = Math.floor(totalMins % 60);
-            document.getElementById("dash-study-time").innerText = `${h}h ${m < 10 ? '0'+m : m}m`;
+            const timeElem = document.getElementById("dash-study-time");
+            if(timeElem) timeElem.innerText = `${h}h ${m < 10 ? '0'+m : m}m`;
 
             let p = Math.floor(((weeklyMins/60) / currentGoal) * 100);
             if(p > 100) p = 100;
-            document.getElementById("dash-progress-bar").style.width = `${p}%`;
-            document.getElementById("dash-progress-text").innerText = `${p}%`;
+            const barElem = document.getElementById("dash-progress-bar");
+            if(barElem) barElem.style.width = `${p}%`;
+            const textElem = document.getElementById("dash-progress-text");
+            if(textElem) textElem.innerText = `${p}%`;
 
             list.reverse().forEach(item => {
                 const li = document.createElement("li");
@@ -502,6 +554,7 @@
 
         function renderRewards(storeMap) {
             const container = document.getElementById("shop-container");
+            if(!container) return;
             container.innerHTML = "";
             Object.keys(storeMap).forEach(key => {
                 const item = storeMap[key];
@@ -544,7 +597,9 @@
         }
 
         function submitGoalSettings() {
-            const hours = parseInt(document.getElementById("input-goal-hours").value, 10);
+            const hoursElem = document.getElementById("input-goal-hours");
+            if(!hoursElem) return;
+            const hours = parseInt(hoursElem.value, 10);
             if(isNaN(hours) || hours <= 0) { alert("正しい目標時間を入力してね！"); return; }
             db.ref(`data/${currentUser}/goalHours`).set(hours).then(() => {
                 alert("目標時間を変更しました！");
