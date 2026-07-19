@@ -21,11 +21,18 @@
             --filter-color: rgba(255, 240, 243, 0.75);
         }
 
+        /* 🎀 21行目付近のダークモード用の上書き設定 */
         body.dark-mode {
             --bg-color: #2a1f26; --main-pink: #c96788; --dark-pink: #e07b9e; --soft-pink: #44323c;
             --text-color: #fce4e8; --text-muted: #b898a1; --card-bg: #362831;
             --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png');
             --filter-color: rgba(42, 31, 38, 0.85);
+        }
+
+        /* 👑 ロック画面の画像と色合い（フィルター）をダークモード用に強制上書き */
+        body.dark-mode #lock-screen {
+            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png');
+            --filter-color: rgba(42, 31, 38, 0.85); /* ★色合いもダーク用に変更 */
         }
 
         body {
