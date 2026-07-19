@@ -265,8 +265,26 @@
         function checkPassword() { if(document.getElementById("pass-input").value === SECRET_PASSWORD) { firebase.initializeApp(firebaseConfig); db = firebase.database(); document.getElementById("lock-screen").style.opacity = "0"; setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500); startListening(); } else alert("パスワードがちがいます！"); }
         function switchView(viewName) { document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(btn => { if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active'); else btn.classList.remove('active'); }); if(viewName === 'analytics') renderCharts(); }
         function switchUser(userKey) { if(currentUser === userKey) return; currentUser = userKey; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${userKey}`).classList.add('active'); if(dbListenerRef) dbListenerRef.off(); startListening(); }
-        function toggleDarkMode() { const body = document.body; body.classList.toggle('dark-mode'); const btn = document.getElementById('dark-mode-btn'); if(body.classList.contains('dark-mode')){ btn.innerText = "☀️ ライトモードに戻す"; btn.style.backgroundColor = "#c96788"; btn.style.color = "#fff"; } else { btn.innerText = "🌙 ダークモードをON"; btn.style.backgroundColor = "var(--soft-pink)"; btn.style.color = "var(--text-color)"; } if(document.getElementById('view-analytics').classList.contains('active')) renderCharts(); }
+        function toggleDarkMode() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        const btn = document.getElementById('dark-mode-btn');
+        
+        // 🎀 現在の状態をブラウザに保存する処理を追加
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'on' : 'off');
 
+            if(body.classList.contains('dark-mode')){
+                btn.innerText = "☀️ ライトモードに戻す";
+                btn.style.backgroundColor = "#c96788";
+                btn.style.color = "#fff";
+            } else {
+                btn.innerText = "🌙 ダークモードをON";
+                btn.style.backgroundColor = "var(--soft-pink)";
+                btn.style.color = "var(--text-color)";
+            }
+            if(document.getElementById('view-analytics').classList.contains('active')) renderCharts();
+        }
         let timerSec = 0; let timerInterval = null;
         function formatTime(s) { const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); const sec = s%60; return `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${sec<10?'0':''}${sec}`; }
         function startTimer() { if(!timerInterval) timerInterval = setInterval(() => { timerSec++; document.getElementById('timer-display').innerText = formatTime(timerSec); }, 1000); }
@@ -275,6 +293,17 @@
         function logTimerTime() { pauseTimer(); let hours = (timerSec / 3600).toFixed(1); if(hours < 0.1) hours = 0.1; document.getElementById('quick-hours').value = hours; updateQuickLabel(hours); alert(`タイマーの記録（${hours}時間）をセットしました！`); resetTimer(); }
 
         function startListening() {
+        // 🎀 前回保存したダークモード状態をチェックして自動適用する処理を追加
+            if (localStorage.getItem('darkMode') === 'on') {
+                document.body.classList.add('dark-mode');
+                const btn = document.getElementById('dark-mode-btn');
+                if (btn) {
+                    btn.innerText = "☀️ ライトモードに戻す";
+                    btn.style.backgroundColor = "#c96788";
+                    btn.style.color = "#fff";
+                }
+            }
+
             dbListenerRef = db.ref(`data/${currentUser}`);
             dbListenerRef.on("value", snap => {
                 const data = snap.val() || {}; currentPoints = data.points || 0; currentGoal = data.goalHours || 45; globalHistoryData = data.history || {};
