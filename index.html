@@ -267,8 +267,12 @@
             </div>
         </div>
     </main>
-
+    
     <script>
+        // 🎀 【ここを追加！】アプリ起動の瞬間にダークモードの記憶を最優先で適用する
+        if (localStorage.getItem('darkMode') === 'on') {
+            document.body.classList.add('dark-mode');
+        }
         const firebaseConfig = { apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw", authDomain: "gohoubipt.firebaseapp.com", databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "gohoubipt", storageBucket: "gohoubipt.appspot.com", messagingSenderId: "133130532450", appId: "1:133130532450:web:41476b156bb892e62e833b" };
         const SECRET_PASSWORD = "ayu"; let db; let currentUser = 'ayu'; let currentPoints = 0; let currentGoal = 45; let dbListenerRef = null; let globalHistoryData = {};
 
