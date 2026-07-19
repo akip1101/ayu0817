@@ -203,6 +203,10 @@
         .danger-zone { display: flex; justify-content: center; gap: 15px; margin: 30px 0 50px 0; }
         .btn-sub { background: #ffffff; border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
 
+        /* ミニタグリスト（カテゴリ管理用） */
+        .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tag-badge { background-color: var(--soft-pink); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+
         @media (max-width: 900px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -242,8 +246,8 @@
                 ご褒美ストア
             </button>
             <button class="nav-item" onclick="switchView('goals')">
-                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="目標設定">
-                目標設定
+                <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="各種設定">
+                各種設定
             </button>
         </div>
     </aside>
@@ -259,8 +263,8 @@
             ご褒美ストア
         </button>
         <button class="nav-item" onclick="switchView('goals')">
-            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="目標設定">
-            目標設定
+            <img class="nav-icon-img" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png" alt="各種設定">
+            各種設定
         </button>
     </nav>
 
@@ -301,14 +305,14 @@
                     </div>
                 </section>
 
-                <!-- 中列: クイック勉強きろく (教科から自由記述に変更) -->
+                <!-- 中列: クイック勉強きろく (カスタムドロップダウン連動) -->
                 <section class="notebook-card">
                     <h3 class="card-title">勉強記録</h3>
                     <p class="card-subtitle">勉強時間をさくっと記録</p>
                     
                     <div class="form-group">
-                        <label>何をした？（内容・教材など）:</label>
-                        <input type="text" id="quick-content" placeholder="例: 数学の基礎問題、単語帳など">
+                        <label>カテゴリ（何をした？）:</label>
+                        <select id="quick-category-select"></select>
                     </div>
                     <div class="form-group">
                         <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
@@ -356,17 +360,33 @@
             </div>
         </div>
 
-        <!-- 📊 ③ 目標設定画面 -->
+        <!-- 📊 ③ 各種設定画面 -->
         <div id="view-goals" class="view-content">
-            <section class="notebook-card" style="max-width: 500px; margin: 0 auto;">
-                <h3 class="card-title">目標設定</h3>
-                <p class="card-subtitle">今週の目標勉強時間をきめる</p>
-                <div class="form-group">
-                    <label>目標時間 (時間単位):</label>
-                    <input type="number" id="input-goal-hours" min="1" value="45">
-                </div>
-                <button class="btn-execute" onclick="submitGoalSettings()">目標時間をほぞんする</button>
-            </section>
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; max-width: 900px; margin: 0 auto;">
+                
+                <!-- 目標時間設定 -->
+                <section class="notebook-card">
+                    <h3 class="card-title">目標設定</h3>
+                    <p class="card-subtitle">今週の目標勉強時間をきめる</p>
+                    <div class="form-group">
+                        <label>目標時間 (時間単位):</label>
+                        <input type="number" id="input-goal-hours" min="1" value="45">
+                    </div>
+                    <button class="btn-execute" onclick="submitGoalSettings()">目標時間をほぞんする</button>
+                </section>
+
+                <!-- カテゴリ自由作成設定 -->
+                <section class="notebook-card">
+                    <h3 class="card-title">カテゴリ管理</h3>
+                    <p class="card-subtitle">ドロップダウンに出したい項目を登録</p>
+                    <div class="form-group" style="flex-direction: row; gap: 8px; margin-bottom: 10px;">
+                        <input type="text" id="input-new-category" placeholder="例: ワーク、単語帳、勉強など" style="flex:1;">
+                        <button class="btn-execute" style="width: auto; padding: 11px 20px;" onclick="addCustomCategory()">追加</button>
+                    </div>
+                    <div class="tag-list" id="custom-tags-container"></div>
+                </section>
+
+            </div>
         </div>
 
         <!-- ⚙️ バックアップ等管理 -->
@@ -395,6 +415,7 @@
         let currentPoints = 0;
         let currentGoal = 45;
         let dbListenerRef = null;
+        let activeCategories = [];
 
         function checkPassword() {
             const inputEl = document.getElementById("pass-input");
@@ -445,9 +466,74 @@
                 const goalInput = document.getElementById("input-goal-hours");
                 if(goalInput) goalInput.value = currentGoal;
 
+                // カテゴリの処理（未登録ならデフォルトを配置）
+                activeCategories = data.categories ? Object.values(data.categories) : ["勉強", "ワーク", "単語帳"];
+                renderCategoryDropdown(data.categories || {});
+                renderCategorySettings(data.categories || {});
+
                 renderHistory(data.history || {});
                 renderRewards(data.rewardStore || {});
             });
+        }
+
+        function renderCategoryDropdown(catMap) {
+            const select = document.getElementById("quick-category-select");
+            if(!select) return;
+            select.innerHTML = "";
+            
+            const list = Object.keys(catMap).map(k => catMap[k]);
+            if(list.length === 0) {
+                // デフォルト
+                ["勉強", "ワーク", "単語帳"].forEach(cat => {
+                    const opt = document.createElement("option");
+                    opt.value = cat; opt.innerText = cat;
+                    select.appendChild(opt);
+                });
+            } else {
+                list.forEach(cat => {
+                    const opt = document.createElement("option");
+                    opt.value = cat; opt.innerText = cat;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function renderCategorySettings(catMap) {
+            const container = document.getElementById("custom-tags-container");
+            if(!container) return;
+            container.innerHTML = "";
+            
+            const entries = Object.keys(catMap).map(k => ({key: k, name: catMap[k]}));
+            if(entries.length === 0) {
+                container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-muted);">まだカスタムカテゴリがありません。上のデフォルト3つが自動適用されています。</p>`;
+                return;
+            }
+
+            entries.forEach(item => {
+                const badge = document.createElement("div");
+                badge.className = "tag-badge";
+                badge.innerHTML = `
+                    <span>${item.name}</span>
+                    <span style="cursor:pointer; opacity:0.6;" onclick="deleteCustomCategory('${item.key}')">✕</span>
+                `;
+                container.appendChild(badge);
+            });
+        }
+
+        function addCustomCategory() {
+            const input = document.getElementById("input-new-category");
+            const val = input.value.trim();
+            if(!val) return;
+
+            // 最初が空の状態で追加する場合、デフォルトを一旦ベースにするかそのまま追加
+            const newKey = db.ref().child(`data/${currentUser}/categories`).push().key;
+            db.ref(`data/${currentUser}/categories/${newKey}`).set(val).then(() => {
+                input.value = "";
+            });
+        }
+
+        function deleteCustomCategory(key) {
+            db.ref(`data/${currentUser}/categories/${key}`).remove();
         }
 
         function updateQuickLabel(val) {
@@ -455,9 +541,8 @@
         }
 
         function submitQuickLog() {
-            let content = document.getElementById("quick-content").value.trim();
-            if(!content) { content = "べんきょう"; } // 空欄の場合はデフォルト値
-            
+            const select = document.getElementById("quick-category-select");
+            let content = select ? select.value : "勉強";
             const hours = parseFloat(document.getElementById("quick-hours").value);
             
             const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
@@ -473,8 +558,6 @@
                     };
                 }
                 return data;
-            }, () => {
-                document.getElementById("quick-content").value = ""; // 入力欄をクリア
             });
         }
 
