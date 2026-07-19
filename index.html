@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ayu0817</title>
-    <!-- Google Fonts: 現代的で美しい「Inter」を導入 -->
+    <title>あゆ＆あやき ぽいんとるーむ</title>
+    <!-- Google Fonts: 丸みのある可愛い日本語フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
     <!-- Firebase SDKの読み込み (CDN経由) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            --text-color: #1a1e24;
-            --text-muted: #7d8590;
-            --card-bg: rgba(255, 255, 255, 0.75);
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
-            --accent-pink: #ff5e7e;
-            --btn-add: #2ecc71;
-            --btn-sub: #e74c3c;
-            --border-color: rgba(0, 0, 0, 0.04);
-            --slider-bg: rgba(0, 0, 0, 0.06);
+            /* マイメロディをイメージしたパステルカラー */
+            --bg-gradient: linear-gradient(135deg, #ffeef2 0%, #ffdee6 100%);
+            --text-color: #5a4b4e; /* 優しいダークブラウン */
+            --text-muted: #a68a90;
+            --card-bg: rgba(255, 255, 255, 0.85); /* ふんわり白 */
+            --card-shadow: 0 8px 24px rgba(255, 150, 170, 0.15);
+            --glass-border: 2px solid #ffffff;
+            --accent-pink: #ff8fa9; /* いちごピンク */
+            --accent-soft: #ffb7ca;
+            --btn-add: #ff7597;
+            --btn-sub: #bfa5a9;
+            --border-color: rgba(255, 183, 202, 0.3);
+            --slider-bg: #ffe0e6;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
             background: var(--bg-gradient);
             background-attachment: fixed;
             color: var(--text-color);
@@ -41,16 +44,37 @@
         }
 
         .container {
-            width: 90%;
+            width: 92%;
             max-width: 400px;
-            margin: 40px auto 80px auto; /* 上部マージンを調整 */
+            margin: 20px auto 80px auto;
         }
 
-        /* 🔒 映画のワンシーンのような美しいロック画面 */
+        /* 🎀 マイメロディ ヘッダーバナー（お気に入りの画像を設定） */
+        .character-banner {
+            width: 100%;
+            height: 180px; /* 画像がきれいに見えるように高さを調整 */
+            background-color: #ffffff;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: var(--glass-border);
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .character-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* キャラクターが切れないように綺麗に収めます */
+            background: #ffffff;
+        }
+
+        /* 🔒 ロック画面 */
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
+            background: #ffeef2;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -59,65 +83,73 @@
             transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .lock-illustration {
+            width: 140px;
+            height: 140px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-bottom: 25px;
+            border: 3px solid #ffb7ca;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        .lock-illustration img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
         #lock-screen h2 {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.3em;
-            color: var(--text-muted);
-            margin-bottom: 50px;
-            text-transform: uppercase;
+            font-size: 1rem;
+            color: #ff7597;
+            margin-bottom: 25px;
+            font-family: 'Mochiy Pop One', sans-serif;
+            letter-spacing: 0.05em;
         }
 
         #lock-screen input {
-            background: transparent;
-            border: none;
-            border-bottom: 1.5px solid #e1e4e8;
-            padding: 12px 0;
-            font-size: 1.6rem;
+            background: #ffffff;
+            border: 2px solid #ffb7ca;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 1.4rem;
             width: 200px;
             text-align: center;
             outline: none;
-            transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            letter-spacing: 0.4em;
-            margin-bottom: 45px;
-            font-weight: 300;
-        }
-
-        #lock-screen input:focus {
-            border-bottom-color: var(--text-color);
+            letter-spacing: 0.2em;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            color: var(--text-color);
         }
 
         #lock-screen button {
-            background-color: var(--text-color);
+            background-color: #ff7597;
             color: white;
             border: none;
-            padding: 14px 44px;
+            padding: 14px 50px;
             border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 14px rgba(255, 117, 151, 0.3);
+            transition: transform 0.2s, opacity 0.2s;
         }
-
         #lock-screen button:hover {
+            transform: scale(1.05);
             opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
         }
 
-        /* 👥 極上ミニマル・切り替えタブ */
+        /* 👥 切り替えタブ */
         .user-tabs {
             display: flex;
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 6px;
             border: var(--glass-border);
             box-shadow: var(--card-shadow);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -126,36 +158,32 @@
             flex: 1;
             background: transparent;
             border: none;
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
+            padding: 14px;
+            border-radius: 18px;
+            font-size: 0.9rem;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .tab-btn.active {
-            background: var(--text-color);
+            background: #ff7597;
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 10px rgba(255, 117, 151, 0.2);
         }
 
         /* 📊 統計表示エリア */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .point-box {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 32px 16px;
+            border-radius: 24px;
+            padding: 24px 12px;
             text-align: center;
             box-shadow: var(--card-shadow);
             border: var(--glass-border);
@@ -163,105 +191,94 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .point-title {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .point-value {
-            font-size: 3.2rem;
-            font-weight: 300;
-            color: var(--text-color);
-            margin: 12px 0 0 0;
+            font-size: 2.8rem;
+            color: #ff7597;
+            margin: 8px 0 0 0;
             display: flex;
             align-items: baseline;
             justify-content: center;
-            letter-spacing: -0.05em;
+            font-family: 'Mochiy Pop One', sans-serif;
         }
 
         .point-unit {
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 1rem;
             margin-left: 4px;
             color: var(--text-muted);
-            letter-spacing: 0;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
         }
 
         /* 📈 進捗ゲージエリア */
         .progress-container {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 24px 28px;
+            padding: 20px 24px;
             border: var(--glass-border);
             box-shadow: var(--card-shadow);
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.65rem;
-            font-weight: 700;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 14px;
-            letter-spacing: 0.12em;
+            margin-bottom: 10px;
         }
 
         .progress-bar-bg {
-            background: rgba(0, 0, 0, 0.04);
-            height: 6px;
-            border-radius: 3px;
+            background: #ffe3e9;
+            height: 10px;
+            border-radius: 5px;
             width: 100%;
             overflow: hidden;
         }
 
         .progress-bar-fill {
-            background: var(--text-color);
+            background: linear-gradient(90deg, #ff9ebb, #ff7597);
             height: 100%;
             width: 0%;
-            border-radius: 3px;
+            border-radius: 5px;
             transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* セクションラベル */
         .section-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            color: var(--text-muted);
-            margin: 32px 0 12px 8px;
+            font-size: 0.8rem;
+            color: #ff7597;
+            margin: 24px 0 10px 8px;
             text-align: left;
-            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* ⚙️ 操作パネル */
         .admin-panel-grid {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 16px;
+            margin-bottom: 30px;
         }
 
         .control-box {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 24px 28px;
+            padding: 20px 24px;
             border: var(--glass-border);
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .slider-header {
@@ -271,116 +288,95 @@
         }
 
         .slider-title {
-            font-size: 0.8rem;
-            font-weight: 500;
+            font-size: 0.85rem;
             color: var(--text-color);
-            letter-spacing: -0.01em;
         }
 
         .val-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 5px 14px;
+            font-size: 0.8rem;
+            padding: 4px 12px;
             border-radius: 20px;
-            letter-spacing: -0.01em;
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* スライダー操作時にバッジを際立たせる */
-        .slider:active ~ .slider-header .val-badge,
-        .control-box:focus-within .val-badge {
-            transform: scale(1.1);
         }
 
         .val-badge-study {
             color: white;
-            background: var(--text-color);
+            background: #ff7597;
         }
 
         .val-badge-reward {
-            color: var(--text-muted);
-            background: rgba(125, 133, 144, 0.08);
+            color: white;
+            background: #ffa1b8;
         }
 
         .val-badge-adjust {
             color: var(--text-muted);
-            background: rgba(0, 0, 0, 0.04);
+            background: #ffe3e9;
         }
 
         /* 🎛️ スライダー */
         .slider {
             -webkit-appearance: none;
             width: 100%;
-            height: 4px;
-            border-radius: 2px;
+            height: 6px;
+            border-radius: 3px;
             background: var(--slider-bg);
             outline: none;
-            margin: 14px 0;
-            transition: background 0.3s;
+            margin: 10px 0;
         }
 
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             background: #ffffff;
-            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            border: 3px solid #ff9ebb;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 6px rgba(255, 117, 151, 0.2);
+            transition: transform 0.2s;
         }
 
         .slider::-webkit-slider-thumb:active {
             transform: scale(1.2);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         }
 
         /* 🔘 実行ボタン */
         .btn-execute {
-            background-color: var(--text-color);
+            background-color: #ff7597;
             color: white;
-            padding: 16px;
-            border-radius: 16px;
+            padding: 14px;
+            border-radius: 18px;
             border: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 10px rgba(255, 117, 151, 0.15);
+            transition: background 0.2s, transform 0.1s;
         }
         .btn-execute:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            background-color: #ff5c83;
         }
         .btn-execute:active {
-            transform: translateY(1px);
+            transform: scale(0.98);
         }
 
         /* 📝 履歴リスト */
         .history-box {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 28px 32px;
+            border-radius: 24px;
+            padding: 24px;
             box-shadow: var(--card-shadow);
             border: var(--glass-border);
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .history-title {
             margin-top: 0;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ffdae3;
+            text-align: center;
         }
 
         .history-list {
@@ -389,24 +385,12 @@
             margin: 0;
             max-height: 280px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .history-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .history-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .history-list::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.08);
-            border-radius: 10px;
         }
 
         .history-item {
             font-size: 0.85rem;
-            padding: 18px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            padding: 14px 0;
+            border-bottom: 1px dashed #ffe3e9;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -419,39 +403,25 @@
         .history-left {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-        }
-
-        .history-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            gap: 2px;
         }
 
         .pt-badge {
-            font-size: 0.8rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-family: 'Mochiy Pop One', sans-serif;
         }
 
         .btn-delete-log {
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 0.95rem;
-            padding: 6px;
-            color: var(--text-muted);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.3;
+            font-size: 1rem;
+            padding: 4px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
-
         .btn-delete-log:hover {
-            color: var(--btn-sub);
             opacity: 1;
-            transform: scale(1.15);
         }
 
         /* ⚠️ セーフティ領域 */
@@ -459,157 +429,130 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            margin-top: 24px;
+            gap: 12px;
+            margin-top: 20px;
             margin-bottom: 80px;
         }
 
-        .btn-secondary-action {
-            background: transparent;
+        .btn-secondary-action, .btn-danger {
+            background: var(--card-bg);
             color: var(--text-color);
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            border: 2px solid #ffdae3;
             padding: 12px 24px;
-            border-radius: 14px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            border-radius: 16px;
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             width: 100%;
-            max-width: 230px;
+            max-width: 240px;
             text-align: center;
-            letter-spacing: 0.02em;
         }
-
         .btn-secondary-action:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-            border-color: rgba(0, 0, 0, 0.12);
+            background: #ffeef2;
         }
-
         .btn-danger {
-            background: transparent;
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.08);
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 230px;
-            text-align: center;
-            letter-spacing: 0.02em;
+            color: #ff5c83;
+            border-color: #ffe3e9;
         }
-
         .btn-danger:hover {
-            background-color: rgba(231, 76, 60, 0.03);
-            border-color: rgba(231, 76, 60, 0.2);
+            background: #fff0f2;
+            border-color: #ffb7ca;
         }
 
         /* 💬 ダイアログ/モーダル */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 222, 230, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 32px;
-            padding: 36px 32px;
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 30px;
             width: 85%;
             max-width: 320px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            box-shadow: 0 16px 40px rgba(255, 117, 151, 0.2);
             text-align: center;
             box-sizing: border-box;
-            border: var(--glass-border);
+            border: 3px solid #ffb7ca;
         }
 
         .modal-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0 0 12px 0;
-            letter-spacing: -0.01em;
+            font-size: 1rem;
+            color: #ff7597;
+            margin: 0 0 10px 0;
         }
 
         .modal-desc {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            line-height: 1.6;
-            margin: 0 0 28px 0;
+            line-height: 1.5;
+            margin: 0 0 20px 0;
         }
 
         .modal-input {
             width: 100%;
-            background: rgba(0, 0, 0, 0.03);
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 1.1rem;
+            background: #ffeef2;
+            border: 2px solid #ffb7ca;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 1.2rem;
             text-align: center;
             outline: none;
             box-sizing: border-box;
-            letter-spacing: 0.15em;
-            margin-bottom: 28px;
-            transition: background 0.3s;
-        }
-
-        .modal-input:focus {
-            background: rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+            color: var(--text-color);
         }
 
         .modal-btn-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
 
         .modal-btn {
             flex: 1;
             border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-btn-cancel {
-            background: rgba(0, 0, 0, 0.04);
+            background: #ffe3e9;
             color: var(--text-color);
         }
 
         .modal-btn-confirm {
-            background: #e74c3c;
+            background: #ff7597;
             color: white;
         }
 
         /* 💾 バックアップ管理用ビュー */
         .backup-list-container {
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             text-align: left;
-            border: 1px solid rgba(0,0,0,0.04);
+            border: 2px dashed #ffdae3;
             border-radius: 16px;
             padding: 8px;
-            background: rgba(255, 255, 255, 0.5);
+            background: #ffeef2;
         }
 
         .backup-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
+            padding: 10px;
+            border-bottom: 1px dashed #ffdae3;
             font-size: 0.75rem;
         }
 
@@ -620,23 +563,17 @@
         .backup-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .backup-restore-btn {
-            background: var(--text-color);
+            background: #ff7597;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-
-        .backup-restore-btn:hover {
-            opacity: 0.85;
+            font-size: 0.75rem;
         }
     </style>
 </head>
@@ -644,9 +581,13 @@
 
     <!-- ロック画面 -->
     <div id="lock-screen">
+        <div class="lock-illustration">
+            <!-- 🍓 ロック画面のマイメロディ画像 -->
+            <img src="https://www.sanrio.co.jp/assets/img/characters/mymelody/mymelody_icon.png" alt="My Melody">
+        </div>
         <h2>ENTER PASSWORD</h2>
         <input type="password" id="pass-input">
-        <button onclick="checkPassword()">UNLOCK</button>
+        <button onclick="checkPassword()">ひらく 🍓</button>
     </div>
 
     <!-- 🔒 確認モーダル -->
@@ -693,6 +634,11 @@
     <!-- メインコンテンツ -->
     <div class="container">
         
+        <!-- 🎀 キャラクター画像ヘッダー（あやきさんお気に入りのイラストを設定！） -->
+        <div class="character-banner">
+            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png" alt="My Melody Banner">
+        </div>
+
         <!-- 👥 ユーザー切り替えタブ -->
         <div class="user-tabs">
             <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
@@ -702,15 +648,15 @@
         <!-- 📊 統計表示 -->
         <div class="stats-grid">
             <div class="point-box">
-                <div class="point-title">Balance</div>
+                <div class="point-title">🍓 まるちぽいんと</div>
                 <div class="point-value">
                     <span id="points-display">0</span>
                     <span class="point-unit">pt</span>
                 </div>
             </div>
             <div class="point-box">
-                <div class="point-title">Total Study</div>
-                <div class="point-value" style="font-size: 2.1rem; font-weight: 300; margin-top: 18px;">
+                <div class="point-title">🕒 ごうけいべんきょう</div>
+                <div class="point-value" style="font-size: 2rem; margin-top: 14px;">
                     <span id="total-study-display">0h 00m</span>
                 </div>
             </div>
@@ -719,7 +665,7 @@
         <!-- 週次目標プログレスバー -->
         <div class="progress-container">
             <div class="progress-header">
-                <span>GOAL PROGRESS (45h/Week)</span>
+                <span>🎀 今週のもくひょう (45h/Week)</span>
                 <span id="progress-percent-label">0%</span>
             </div>
             <div class="progress-bar-bg">
@@ -730,42 +676,42 @@
         <!-- コントロールパネル -->
         <div class="admin-panel-grid">
             <!-- STUDY -->
-            <div class="section-label">STUDY</div>
+            <div class="section-label">🐾 STUDY (おべんきょう)</div>
             <div class="control-box">
                 <div class="slider-header">
-                    <span class="slider-title">学習記録の追加:</span>
+                    <span class="slider-title">がんばった時間をえらぶ:</span>
                     <span id="study-val-label" class="val-badge val-badge-study">+1 pt</span>
                 </div>
                 <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="updateStudyLabel(this.value)">
-                <button class="btn-execute" onclick="executeStudy()">選択した学習時間を記録する</button>
+                <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする 🍓</button>
             </div>
 
             <!-- REWARD -->
-            <div class="section-label">REWARD</div>
+            <div class="section-label">🎈 REWARD (ごほうび)</div>
             <div class="control-box">
                 <div class="slider-header">
-                    <span class="slider-title">ご褒美の使用ポイント:</span>
+                    <span class="slider-title">つかうポイントをえらぶ:</span>
                     <span id="reward-val-label" class="val-badge val-badge-reward">-1 pt</span>
                 </div>
                 <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="updateRewardLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeReward()">選択したポイントで使用する</button>
+                <button class="btn-execute" style="background-color: var(--accent-pink);" onclick="executeReward()">ポイントをつかう 🎀</button>
             </div>
 
             <!-- ADJUST -->
-            <div class="section-label">ADJUST</div>
+            <div class="section-label">🩹 ADJUST (ちょうせい)</div>
             <div class="control-box">
                 <div class="slider-header">
-                    <span class="slider-title">誤記録の調整（減算）:</span>
+                    <span class="slider-title">まちがえて記録したとき:</span>
                     <span id="adjust-val-label" class="val-badge val-badge-adjust">-0.5 pt</span>
                 </div>
                 <input type="range" id="adjust-range" class="slider" min="0.5" max="5" step="0.5" value="0.5" oninput="updateAdjustLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">選択した時間・ポイントを減らす</button>
+                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">まちがいを減らす 🩹</button>
             </div>
         </div>
 
         <!-- 履歴表示 -->
         <div class="history-box">
-            <h3 class="history-title">Log History</h3>
+            <h3 class="history-title">🐾 こんどのきろく (Log History)</h3>
             <ul class="history-list" id="history-container"></ul>
         </div>
 
@@ -792,7 +738,7 @@
         const SECRET_PASSWORD = "ayu"; 
         const GOAL_HOURS = 45; 
         let db;
-        let currentUser = 'ayu'; // 内部管理キー（デフォルト起動時に左側のアクティブ状態に紐付け）
+        let currentUser = 'ayu'; 
         let currentPoints = 0;
         let rawHistoryMap = {}; 
         let pendingActionType = 'reset';
@@ -812,7 +758,6 @@
                     document.getElementById("lock-screen").style.display = "none";
                 }, 500);
                 startListening();
-                // 起動時に自動でバックアップを作成（最大3件維持）
                 setTimeout(autoCreateBackup, 3000);
             } else {
                 alert("認証エラー：パスワードが一致しません。");
@@ -829,16 +774,13 @@
             }
         });
 
-        // 👥 ユーザー切り替え処理
         function switchUser(userKey) {
             if (currentUser === userKey) return;
             currentUser = userKey;
 
-            // タブのCSS切り替え
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`tab-${userKey}`).classList.add('active');
 
-            // Firebaseのリスナーを一度削除して、新しいパスで再接続
             if (dbListenerRef) {
                 dbListenerRef.off();
             }
@@ -846,7 +788,6 @@
         }
 
         function startListening() {
-            // パスは内部キーのまま data/ayaki または data/ayu を利用
             dbListenerRef = db.ref(`data/${currentUser}`);
             dbListenerRef.on("value", (snapshot) => {
                 const content = snapshot.val();
@@ -970,11 +911,11 @@
                 
                 li.innerHTML = `
                     <div class="history-left">
-                        <span style="color: var(--text-color); font-weight: 500;">${item.action}</span>
+                        <span style="color: var(--text-color); font-weight: 700;">${item.action}</span>
                         <span style="font-size: 0.7rem; color: var(--text-muted);">${item.date}</span>
                     </div>
                     <div class="history-right">
-                        <span class="pt-badge" style="color:${item.points > 0 ? 'var(--btn-add)' : 'var(--btn-sub)'}">${ptText}</span>
+                        <span class="pt-badge" style="color:${item.points > 0 ? '#ff5c83' : 'var(--text-muted)'}">${ptText}</span>
                         <button class="btn-delete-log" onclick="deleteHistoryItem('${item.key}')" title="この記録を取り消す">🗑️</button>
                     </div>
                 `;
@@ -1022,7 +963,6 @@
             if (!targetItem) return;
 
             autoCreateBackup();
-
             const pointRefund = -targetItem.points;
 
             if (currentPoints + pointRefund < 0) {
@@ -1046,10 +986,8 @@
             });
         }
 
-        // 💾 自動バックアップ作成機能 (ユーザー個別に最大3つ保持)
         function autoCreateBackup(isResetting = false) {
             if (!db) return;
-
             if (!isResetting && currentPoints === 0 && Object.keys(rawHistoryMap).length <= 1) {
                 return; 
             }
@@ -1060,7 +998,7 @@
 
                 const now = new Date();
                 const userName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
-                const labelSuffix = isResetting ? ` (${userName}初期化直前)` : ` (${userName}自動保存)`;
+                const labelSuffix = isResetting ? ` (${targetName}初期化直前)` : ` (${userName}自動保存)`;
                 const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
                 
                 const backupData = {
@@ -1071,7 +1009,6 @@
                 };
 
                 return db.ref(`backups/${currentUser}`).push(backupData).then(() => {
-                    // 古いバックアップを削除して、ユーザーごとに常に最新「3件」に制限
                     return db.ref(`backups/${currentUser}`).orderByChild("timestamp").once("value", (snap) => {
                         const backups = [];
                         snap.forEach((child) => {
@@ -1106,16 +1043,14 @@
                 }
 
                 backups.reverse();
-
                 backups.forEach((bk) => {
                     const div = document.createElement("div");
                     div.className = "backup-item";
-
                     const pts = bk.dataState.points || 0;
                     
                     div.innerHTML = `
                         <div class="backup-info">
-                            <span style="font-weight:600; color:var(--text-color);">${bk.label}</span>
+                            <span style="font-weight:700; color:var(--text-color);">${bk.label}</span>
                             <span style="color:var(--text-muted); font-size:0.65rem;">保有ポイント: ${pts} pt</span>
                         </div>
                         <button class="backup-restore-btn" onclick="restoreFromBackup('${bk.key}')">復元</button>
@@ -1155,7 +1090,6 @@
             document.getElementById("backup-modal").style.display = "none";
         }
 
-        // 各種スライダーの連動表示
         function updateStudyLabel(val) {
             document.getElementById("study-val-label").innerText = `+${val} pt`;
         }
@@ -1186,18 +1120,14 @@
             resetSlider("adjust-range", 0.5, "adjust-val-label", "-0.5 pt");
         }
 
+        // スライダーのリセット処理
         function resetSlider(sliderId, defaultValue, badgeId, defaultBadgeText) {
             const slider = document.getElementById(sliderId);
-            if (slider) {
-                slider.value = defaultValue;
-            }
+            if (slider) slider.value = defaultValue;
             const badge = document.getElementById(badgeId);
-            if (badge) {
-                badge.innerText = defaultBadgeText;
-            }
+            if (badge) badge.innerText = defaultBadgeText;
         }
 
-        // 初期化ダイアログ表示時、対象ユーザーを日本語に
         function triggerResetFlow() {
             const targetName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
             document.querySelector("#confirm-modal .modal-desc").innerText = `${targetName}のポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。リセット直前に自動バックアップされます。`;
@@ -1208,7 +1138,6 @@
             document.getElementById("confirm-modal").style.display = "none";
         }
 
-        // モーダルを開く処理
         function openPasswordModal(actionType) {
             closeConfirmModal();
             pendingActionType = actionType;
