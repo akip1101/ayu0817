@@ -3,71 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>あゆ＆あやき ぽいんとるーむ</title>
-    <!-- Google Fonts: 丸みのある可愛い日本語フォント -->
+    <title>My Melodic Study Notebook</title>
+    <!-- Google Fonts: 丸みのある可愛い日本語・英語フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
-    <!-- Firebase SDKの読み込み (CDN経由) -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Firebase SDK (CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            /* マイメロディをイメージしたパステルカラー */
-            --bg-gradient: linear-gradient(135deg, #ffeef2 0%, #ffdee6 100%);
-            --text-color: #5a4b4e; /* 優しいダークブラウン */
+            --bg-color: #fff0f3;
+            --main-pink: #ff8fa9;
+            --dark-pink: #ff6b8b;
+            --soft-pink: #ffe3e9;
+            --text-color: #5a4b4e;
             --text-muted: #a68a90;
-            --card-bg: rgba(255, 255, 255, 0.85); /* ふんわり白 */
-            --card-shadow: 0 8px 24px rgba(255, 150, 170, 0.15);
-            --glass-border: 2px solid #ffffff;
-            --accent-pink: #ff8fa9; /* いちごピンク */
-            --accent-soft: #ffb7ca;
-            --btn-add: #ff7597;
-            --btn-sub: #bfa5a9;
-            --border-color: rgba(255, 183, 202, 0.3);
-            --slider-bg: #ffe0e6;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --font-main: 'M PLUS Rounded 1c', sans-serif;
+            --font-eng: 'Fredoka', sans-serif;
         }
 
         body {
-            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-family: var(--font-main);
             font-weight: 700;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
+            background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .container {
-            width: 92%;
-            max-width: 400px;
-            margin: 20px auto 80px auto;
-        }
-
-        /* 🎀 マイメロディ ヘッダーバナー */
-        .character-banner {
-            width: 100%;
-            height: 200px; /* 新しい画像に合わせて高さを最適化 */
-            background-color: #ffffff;
-            border-radius: 24px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            border: var(--glass-border);
-            box-shadow: var(--card-shadow);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .character-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #ffffff;
         }
 
         /* 🔒 ロック画面 */
@@ -79,13 +46,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2000;
+            transition: opacity 0.5s ease;
         }
-
         .lock-illustration {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
             background: #ffffff;
             border-radius: 50%;
             margin-bottom: 20px;
@@ -101,486 +67,354 @@
             height: 85%;
             object-fit: contain;
         }
-
         #lock-screen h2 {
-            font-size: 0.9rem;
-            color: #ff6b8b;
+            font-size: 1.2rem;
+            font-family: var(--font-eng);
+            color: var(--dark-pink);
             margin-bottom: 20px;
-            font-family: 'M PLUS Rounded 1c', sans-serif;
-            letter-spacing: 0.1em;
-            font-weight: 700;
+            letter-spacing: 0.05em;
         }
-
         #lock-screen input {
             background: #ffffff;
-            border: none;
+            border: 2px solid var(--soft-pink);
             border-radius: 24px;
-            padding: 14px;
-            font-size: 1.4rem;
-            width: 220px;
+            padding: 12px;
+            font-size: 1.2rem;
+            width: 200px;
             text-align: center;
             outline: none;
-            letter-spacing: 0.2em;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 15px rgba(255, 183, 202, 0.2);
-            color: var(--text-color);
-            transition: box-shadow 0.3s;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(255, 183, 202, 0.2);
         }
-        
-        #lock-screen input:focus {
-            box-shadow: 0 6px 20px rgba(255, 117, 151, 0.3);
-        }
-
         #lock-screen button {
-            background-color: #ff7597;
+            background-color: var(--main-pink);
             color: white;
             border: none;
-            padding: 14px 60px;
+            padding: 12px 50px;
             border-radius: 24px;
             font-size: 0.9rem;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(255, 117, 151, 0.3);
-            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
             font-weight: 700;
         }
-        #lock-screen button:hover {
-            transform: scale(1.03);
-            background-color: #ff5c83;
+
+        /* 🎀 サイドナビゲーション (PC用) */
+        .sidebar {
+            width: 90px;
+            background-color: #fffbfa;
+            border-right: 3px solid var(--soft-pink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 30px;
+        }
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-family: var(--font-eng);
+            font-size: 0.65rem;
+            font-weight: 600;
+            gap: 4px;
+            padding: 10px 0;
+            transition: all 0.2s;
+        }
+        .nav-item.active, .nav-item:hover {
+            color: var(--dark-pink);
+            background-color: #ffeef2;
+            border-radius: 12px;
+            margin: 0 8px;
+        }
+        .nav-icon {
+            font-size: 1.4rem;
         }
 
-        /* 👥 切り替えタブ */
+        /* 📱 スマホ用ボトムナビゲーション (初期状態は非表示) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 65px;
+            background-color: #fffbfa;
+            border-top: 3px solid var(--soft-pink);
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+        .bottom-nav .nav-item {
+            padding: 0;
+            flex: 1;
+        }
+
+        /* 🏠 メインレイアウト */
+        .main-wrapper {
+            margin-left: 90px; /* サイドバーの幅の分空ける */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            max-width: 1200px;
+            width: calc(100% - 90px);
+        }
+
+        /* 👑 ヘッダーエリア */
+        .header-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .top-banner {
+            max-width: 320px;
+            width: 80%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .welcome-title {
+            font-family: var(--font-eng);
+            font-size: 1.5rem;
+            color: var(--dark-pink);
+            margin: 5px 0;
+        }
+        .welcome-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        /* 👥 ユーザー切り替えタブ */
         .user-tabs {
             display: flex;
-            background: var(--card-bg);
+            background: #ffffff;
             border-radius: 24px;
-            padding: 6px;
-            border: var(--glass-border);
-            box-shadow: var(--card-shadow);
-            margin-bottom: 20px;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 4px;
+            border: 2px solid var(--soft-pink);
+            margin: 15px auto;
+            max-width: 300px;
         }
-
         .tab-btn {
             flex: 1;
             background: transparent;
             border: none;
-            padding: 14px;
-            border-radius: 18px;
-            font-size: 0.9rem;
+            padding: 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-weight: 700;
+            transition: all 0.2s;
         }
-
         .tab-btn.active {
-            background: #ff7597;
+            background: var(--main-pink);
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 117, 151, 0.2);
         }
 
-        /* 📊 統計表示エリア */
-        .stats-grid {
+        /* 📦 ダッシュボードグリッド（3カラム構成） */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 20px;
+            align-items: start;
         }
 
-        .point-box {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px 12px;
+        /* 📝 ノート・カード基盤 */
+        .notebook-card {
+            background-color: var(--card-bg);
+            border: 3px solid var(--soft-pink);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(255, 143, 169, 0.05);
+            position: relative;
+        }
+        
+        /* カード見出し */
+        .card-title {
+            font-family: var(--font-eng);
+            font-size: 1.1rem;
+            color: var(--dark-pink);
+            margin-top: 0;
+            margin-bottom: 5px;
             text-align: center;
-            box-shadow: var(--card-shadow);
-            border: var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
-
-        .point-title {
+        .card-subtitle {
             font-size: 0.75rem;
             color: var(--text-muted);
-            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
-        .point-value {
-            font-size: 2.8rem;
-            color: #ff7597;
-            margin: 8px 0 0 0;
-            display: flex;
-            align-items: baseline;
-            justify-content: center;
-            font-family: 'Mochiy Pop One', sans-serif;
+        /* 📊 左カラム: Progress ボックス */
+        .point-display-container {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: var(--bg-color);
+            padding: 15px;
+            border-radius: 16px;
+        }
+        .point-val {
+            font-size: 2.5rem;
+            color: var(--dark-pink);
+            font-family: var(--font-eng);
+            margin: 5px 0;
+        }
+        .study-time-val {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin: 5px 0;
         }
 
-        .point-unit {
-            font-size: 1rem;
-            margin-left: 4px;
-            color: var(--text-muted);
-            font-family: 'M PLUS Rounded 1c', sans-serif;
-        }
-
-        /* 📈 進捗ゲージエリア */
-        .progress-container {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 20px 24px;
-            border: var(--glass-border);
-            box-shadow: var(--card-shadow);
-            margin-bottom: 24px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
+        /* 進捗バー */
         .progress-bar-bg {
             background: #ffe3e9;
-            height: 10px;
-            border-radius: 5px;
+            height: 12px;
+            border-radius: 6px;
             width: 100%;
             overflow: hidden;
+            margin-top: 10px;
         }
-
         .progress-bar-fill {
-            background: linear-gradient(90deg, #ff9ebb, #ff7597);
+            background: linear-gradient(90deg, #ff9ebb, var(--main-pink));
             height: 100%;
             width: 0%;
-            border-radius: 5px;
-            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 6px;
+            transition: width 0.5s ease;
         }
 
-        /* セクションラベル */
-        .section-label {
-            font-size: 0.8rem;
-            color: #ff7597;
-            margin: 24px 0 10px 8px;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        /* 📓 中央カラム: バインダー風ノート面 */
+        .center-notebook {
+            border-left: 12px solid #ffccd7; /* ルーズリーフの端っこ風 */
         }
 
-        /* ⚙️ 操作パネル */
-        .admin-panel-grid {
+        /* 操作パネル用スライダー＆ボタン */
+        .control-group {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-top: 15px;
         }
-
         .control-box {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 20px 24px;
-            border: var(--glass-border);
-            box-shadow: var(--card-shadow);
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
         }
-
         .slider-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .slider-title {
-            font-size: 0.85rem;
-            color: var(--text-color);
-        }
-
-        .val-badge {
             font-size: 0.8rem;
-            padding: 4px 12px;
-            border-radius: 20px;
         }
-
-        .val-badge-study {
-            color: white;
-            background: #ff7597;
-        }
-
-        .val-badge-reward {
-            color: white;
-            background: #ffa1b8;
-        }
-
-        .val-badge-adjust {
-            color: var(--text-muted);
-            background: #ffe3e9;
-        }
-
-        /* 🎛️ スライダー */
         .slider {
             -webkit-appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: var(--slider-bg);
+            background: #fff;
             outline: none;
-            margin: 10px 0;
         }
-
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
-            width: 26px;
-            height: 26px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: #ffffff;
-            border: 3px solid #ff9ebb;
+            background: var(--main-pink);
+            border: 2px solid #fff;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(255, 117, 151, 0.2);
-            transition: transform 0.2s;
         }
-
-        .slider::-webkit-slider-thumb:active {
-            transform: scale(1.2);
-        }
-
-        /* 🔘 実行ボタン */
         .btn-execute {
-            background-color: #ff7597;
+            background-color: var(--main-pink);
             color: white;
-            padding: 14px;
-            border-radius: 18px;
+            padding: 10px;
+            border-radius: 14px;
             border: none;
             font-size: 0.85rem;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 117, 151, 0.15);
-            transition: background 0.2s, transform 0.1s;
+            font-weight: 700;
         }
         .btn-execute:hover {
-            background-color: #ff5c83;
-        }
-        .btn-execute:active {
-            transform: scale(0.98);
+            background-color: var(--dark-pink);
         }
 
-        /* 📝 履歴リスト */
-        .history-box {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: var(--card-shadow);
-            border: var(--glass-border);
-            margin-bottom: 24px;
-        }
-
-        .history-title {
-            margin-top: 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            padding-bottom: 12px;
-            border-bottom: 2px dashed #ffdae3;
-            text-align: center;
-        }
-
+        /* 📋 右カラム: 履歴ログリスト */
         .history-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 280px;
+            max-height: 250px;
             overflow-y: auto;
         }
-
         .history-item {
-            font-size: 0.85rem;
-            padding: 14px 0;
-            border-bottom: 1px dashed #ffe3e9;
+            font-size: 0.8rem;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--soft-pink);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-left {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .pt-badge {
-            font-size: 0.9rem;
-            font-family: 'Mochiy Pop One', sans-serif;
-        }
-
         .btn-delete-log {
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
-            padding: 4px;
-            opacity: 0.4;
-            transition: opacity 0.2s;
+            opacity: 0.5;
         }
-        .btn-delete-log:hover {
-            opacity: 1;
-        }
+        .btn-delete-log:hover { opacity: 1; }
 
-        /* ⚠️ セーフティ領域 */
+        /* ⚙️ 下部管理アクション */
         .danger-zone {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 20px;
-            margin-bottom: 80px;
-        }
-
-        .btn-secondary-action, .btn-danger {
-            background: var(--card-bg);
-            color: var(--text-color);
-            border: 2px solid #ffdae3;
-            padding: 12px 24px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            max-width: 240px;
-            text-align: center;
-        }
-        .btn-secondary-action:hover {
-            background: #ffeef2;
-        }
-        .btn-danger {
-            color: #ff5c83;
-            border-color: #ffe3e9;
-        }
-        .btn-danger:hover {
-            background: #fff0f2;
-            border-color: #ffb7ca;
-        }
-
-        /* 💬 ダイアログ/モーダル */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 222, 230, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
             justify-content: center;
-            align-items: center;
-            z-index: 2000;
+            gap: 15px;
+            margin: 30px 0 50px 0;
         }
-
-        .modal-card {
+        .btn-sub {
             background: #ffffff;
-            border-radius: 28px;
-            padding: 30px;
-            width: 85%;
-            max-width: 320px;
-            box-shadow: 0 16px 40px rgba(255, 117, 151, 0.2);
-            text-align: center;
-            box-sizing: border-box;
-            border: 3px solid #ffb7ca;
-        }
-
-        .modal-title {
-            font-size: 1rem;
-            color: #ff7597;
-            margin: 0 0 10px 0;
-        }
-
-        .modal-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin: 0 0 20px 0;
-        }
-
-        .modal-input {
-            width: 100%;
-            background: #ffeef2;
-            border: 2px solid #ffb7ca;
-            padding: 12px;
-            border-radius: 16px;
-            font-size: 1.2rem;
-            text-align: center;
-            outline: none;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-
-        .modal-btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            border: none;
-            padding: 14px;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .modal-btn-cancel {
-            background: #ffe3e9;
-            color: var(--text-color);
-        }
-
-        .modal-btn-confirm {
-            background: #ff7597;
-            color: white;
-        }
-
-        /* 💾 バックアップ管理用ビュー */
-        .backup-list-container {
-            max-height: 180px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            text-align: left;
-            border: 2px dashed #ffdae3;
-            border-radius: 16px;
-            padding: 8px;
-            background: #ffeef2;
-        }
-
-        .backup-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px dashed #ffdae3;
+            border: 2px solid var(--soft-pink);
+            padding: 8px 16px;
+            border-radius: 12px;
             font-size: 0.75rem;
-        }
-
-        .backup-item:last-child {
-            border-bottom: none;
-        }
-
-        .backup-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .backup-restore-btn {
-            background: #ff7597;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.75rem;
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        /* 📱 レスポンシブ設計 (スマートフォン向け表示) */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                display: none; /* 横のサイドバーを消す */
+            }
+            .bottom-nav {
+                display: flex; /* 下部のメニューバーを出す */
+            }
+            .main-wrapper {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px 15px 80px 15px; /* 下部ナビに被らないよう余白を追加 */
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr; /* 3列から1列の縦並びに変更 */
+                gap: 15px;
+            }
         }
     </style>
 </head>
@@ -589,148 +423,115 @@
     <!-- ロック画面 -->
     <div id="lock-screen">
         <div class="lock-illustration">
-            <!-- 🎀 ロック画面のマイメロディ画像もお気に入りのイラストに統一 -->
             <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melody">
         </div>
         <h2>ENTER PASSWORD</h2>
         <input type="password" id="pass-input">
-        <button onclick="checkPassword()">ひらく</button>
+        <button onclick="checkPassword()">Open</button>
     </div>
 
-    <!-- 🔒 確認モーダル -->
-    <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 class="modal-title">システム初期化</h3>
-            <p class="modal-desc">選択中のユーザーのポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。リセット直前に自動バックアップされます。</p>
-            <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">キャンセル</button>
-                <button class="modal-btn modal-btn-confirm" onclick="openPasswordModal('reset')">初期化を実行</button>
-            </div>
+    <!-- 🎀 サイドナビゲーション (PC表示用) -->
+    <aside class="sidebar">
+        <img class="sidebar-logo" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="Icon">
+        <div class="sidebar-menu">
+            <button class="nav-item active"><span class="nav-icon">🏠</span>Dashboard</button>
+            <button class="nav-item"><span class="nav-icon">📓</span>Notebook</button>
+            <button class="nav-item"><span class="nav-icon">📊</span>Goal</button>
         </div>
-    </div>
+    </aside>
 
-    <!-- 🔒 パスワード入力用モーダル -->
-    <div id="password-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 class="modal-title">管理者認証</h3>
-            <p class="modal-desc">セキュリティ保護のため、パスワードを入力してください。</p>
-            <input type="password" id="reset-pass-input" class="modal-input">
-            <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-cancel" onclick="closePasswordModal()">キャンセル</button>
-                <button class="modal-btn modal-btn-confirm" id="pwd-modal-confirm-btn">実行する</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 💾 バックアップ管理モーダル -->
-    <div id="backup-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 360px;">
-            <h3 class="modal-title">バックアップ管理</h3>
-            <p class="modal-desc">選択中ユーザーの、自動退避された直近3つまでの履歴データから選択して復元します。</p>
-            
-            <div class="backup-list-container" id="backup-list">
-                <div style="text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.8rem;">バックアップはありません</div>
-            </div>
-
-            <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-cancel" onclick="closeBackupModal()" style="width: 100%;">閉じる</button>
-            </div>
-        </div>
-    </div>
+    <!-- 📱 ボトムナビゲーション (スマホ表示用) -->
+    <nav class="bottom-nav">
+        <button class="nav-item active"><span class="nav-icon">🏠</span>Dashboard</button>
+        <button class="nav-item"><span class="nav-icon">📓</span>Notebook</button>
+        <button class="nav-item"><span class="nav-icon">📊</span>Goal</button>
+    </nav>
 
     <!-- メインコンテンツ -->
-    <div class="container">
+    <main class="main-wrapper">
         
-        <!-- 🎀 キャラクター画像ヘッダー（新しいお気に入りデザインギャラリーの画像！） -->
-        <div class="character-banner">
-            <img src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melody Banner">
-        </div>
+        <!-- ヘッダー -->
+        <section class="header-section">
+            <img class="top-banner" src="https://www.sanrio.co.jp/wp-content/uploads/2022/06/gallery-mymelody3.png" alt="My Melodic Banner">
+            <h1 class="welcome-title">My Melodic Study Notebook</h1>
+            <p class="welcome-subtitle">ハロー！きょうも いっしょに がんばろう！</p>
+            
+            <!-- 👥 ユーザー切り替え -->
+            <div class="user-tabs">
+                <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
+                <button id="tab-ayaki" class="tab-btn" onclick="switchUser('ayaki')">あやき用</button>
+            </div>
+        </section>
 
-        <!-- 👥 ユーザー切り替えタブ -->
-        <div class="user-tabs">
-            <button id="tab-ayu" class="tab-btn active" onclick="switchUser('ayu')">あゆ用</button>
-            <button id="tab-ayaki" class="tab-btn" onclick="switchUser('ayaki')">あやき用</button>
-        </div>
-
-        <!-- 📊 統計表示 -->
-        <div class="stats-grid">
-            <div class="point-box">
-                <div class="point-title">まるちぽいんと</div>
-                <div class="point-value">
-                    <span id="points-display">0</span>
-                    <span class="point-unit">pt</span>
+        <!-- 3カラム/縦並び 可変グリッド -->
+        <div class="dashboard-grid">
+            
+            <!-- 📊 左カラム: Progress ボックス -->
+            <article class="notebook-card">
+                <h3 class="card-title">Study Progress</h3>
+                <p class="card-subtitle">現在の目標達成状況</p>
+                
+                <div class="point-display-container">
+                    <div style="font-size:0.75rem; color:var(--text-muted)">まるちぽいんと</div>
+                    <div class="point-val"><span id="points-display">0</span><span style="font-size:1rem; margin-left:4px;">pt</span></div>
                 </div>
-            </div>
-            <div class="point-box">
-                <div class="point-title">ごうけいべんきょう</div>
-                <div class="point-value" style="font-size: 2rem; margin-top: 14px;">
-                    <span id="total-study-display">0h 00m</span>
+
+                <div class="point-display-container">
+                    <div style="font-size:0.75rem; color:var(--text-muted)">ごうけいべんきょう</div>
+                    <div class="study-time-val" id="total-study-display">0h 00m</div>
                 </div>
-            </div>
+
+                <div style="margin-top: 15px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
+                        <span>今週のもくひょう (45h)</span>
+                        <span id="progress-percent-label">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 📓 中央カラム: 操作ノートパネル -->
+            <article class="notebook-card center-notebook">
+                <h3 class="card-title">Mistake & Study Note</h3>
+                <p class="card-subtitle">ポイントの記録やつかう調整</p>
+
+                <div class="control-group">
+                    <!-- STUDY -->
+                    <div class="control-box">
+                        <div class="slider-header"><span>がんばった時間を選ぶ:</span><span id="study-val-label">+1 pt</span></div>
+                        <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="document.getElementById('study-val-label').innerText='+'+this.value+' pt'">
+                        <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする</button>
+                    </div>
+
+                    <!-- REWARD -->
+                    <div class="control-box">
+                        <div class="slider-header"><span>つかうポイントを選ぶ:</span><span id="reward-val-label">-1 pt</span></div>
+                        <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="document.getElementById('reward-val-label').innerText='-'+this.value+' pt'">
+                        <button class="btn-execute" style="background-color: var(--dark-pink);" onclick="executeReward()">ポイントをつかう</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 📋 右カラム: History ログ -->
+            <article class="notebook-card">
+                <h3 class="card-title">Today's Notes</h3>
+                <p class="card-subtitle">最近のうごきの履歴</p>
+                <ul class="history-list" id="history-container"></ul>
+            </article>
+
         </div>
 
-        <!-- 週次目標プログレスバー -->
-        <div class="progress-container">
-            <div class="progress-header">
-                <span>今週のもくひょう (45h/Week)</span>
-                <span id="progress-percent-label">0%</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div id="progress-bar-fill" class="progress-bar-fill"></div>
-            </div>
-        </div>
-
-        <!-- コントロールパネル -->
-        <div class="admin-panel-grid">
-            <!-- STUDY -->
-            <div class="section-label">STUDY (おべんきょう)</div>
-            <div class="control-box">
-                <div class="slider-header">
-                    <span class="slider-title">がんばった時間をえらぶ:</span>
-                    <span id="study-val-label" class="val-badge val-badge-study">+1 pt</span>
-                </div>
-                <input type="range" id="study-range" class="slider" min="0.5" max="10" step="0.5" value="1" oninput="updateStudyLabel(this.value)">
-                <button class="btn-execute" onclick="executeStudy()">勉強時間をきろくする</button>
-            </div>
-
-            <!-- REWARD -->
-            <div class="section-label">REWARD (ごほうび)</div>
-            <div class="control-box">
-                <div class="slider-header">
-                    <span class="slider-title">つかうポイントをえらぶ:</span>
-                    <span id="reward-val-label" class="val-badge val-badge-reward">-1 pt</span>
-                </div>
-                <input type="range" id="reward-range" class="slider" min="1" max="30" value="1" oninput="updateRewardLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--accent-pink);" onclick="executeReward()">ポイントをつかう</button>
-            </div>
-
-            <!-- ADJUST -->
-            <div class="section-label">ADJUST (ちょうせい)</div>
-            <div class="control-box">
-                <div class="slider-header">
-                    <span class="slider-title">まちがえて記録したとき:</span>
-                    <span id="adjust-val-label" class="val-badge val-badge-adjust">-0.5 pt</span>
-                </div>
-                <input type="range" id="adjust-range" class="slider" min="0.5" max="5" step="0.5" value="0.5" oninput="updateAdjustLabel(this.value)">
-                <button class="btn-execute" style="background-color: var(--text-muted);" onclick="executeAdjust()">まちがいを減らす</button>
-            </div>
-        </div>
-
-        <!-- 履歴表示 -->
-        <div class="history-box">
-            <h3 class="history-title">こんどのきろく (Log History)</h3>
-            <ul class="history-list" id="history-container"></ul>
-        </div>
-
-        <!-- セーフティ領域 -->
+        <!-- 管理エリア -->
         <div class="danger-zone">
-            <button class="btn-secondary-action" onclick="openPasswordModal('backup')">バックアップを復元する</button>
-            <button class="btn-danger" onclick="triggerResetFlow()">システム全体の完全初期化</button>
+            <button class="btn-sub" onclick="alert('バックアップ機能はデータ連携後に利用できます')">データ復元</button>
+            <button class="btn-sub" style="color:var(--dark-pink)" onclick="triggerResetFlow()">データの初期化</button>
         </div>
-    </div>
+    </main>
 
     <script>
-        // --- Firebaseの設定 ---
+        // Firebaseのコンフィグレーション
         const firebaseConfig = {
             apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
             authDomain: "gohoubipt.firebaseapp.com",
@@ -747,50 +548,29 @@
         let db;
         let currentUser = 'ayu'; 
         let currentPoints = 0;
-        let rawHistoryMap = {}; 
-        let pendingActionType = 'reset';
         let dbListenerRef = null;
 
-        // パスワードチェック (ロック解除)
         function checkPassword() {
             const inputEl = document.getElementById("pass-input");
-            const password = inputEl.value;
-            
-            if (password === SECRET_PASSWORD) {
+            if (inputEl.value === SECRET_PASSWORD) {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
                 
                 document.getElementById("lock-screen").style.opacity = "0";
-                setTimeout(() => {
-                    document.getElementById("lock-screen").style.display = "none";
-                }, 500);
+                setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500);
                 startListening();
-                setTimeout(autoCreateBackup, 3000);
             } else {
-                alert("認証エラー：パスワードが一致しません。");
+                alert("パスワードがちがいます！");
                 inputEl.value = "";
-                setTimeout(() => {
-                    inputEl.focus();
-                }, 50);
             }
         }
-
-        document.getElementById("pass-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                checkPassword();
-            }
-        });
 
         function switchUser(userKey) {
             if (currentUser === userKey) return;
             currentUser = userKey;
-
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`tab-${userKey}`).classList.add('active');
-
-            if (dbListenerRef) {
-                dbListenerRef.off();
-            }
+            if (dbListenerRef) dbListenerRef.off();
             startListening();
         }
 
@@ -798,414 +578,109 @@
             dbListenerRef = db.ref(`data/${currentUser}`);
             dbListenerRef.on("value", (snapshot) => {
                 const content = snapshot.val();
-                
                 if (content) {
                     currentPoints = content.points || 0;
-                    rawHistoryMap = content.history || {};
-                    renderUI(currentPoints, rawHistoryMap);
+                    renderUI(currentPoints, content.history || {});
                 } else {
-                    const initialData = {
-                        points: 0,
-                        history: {
-                            "init": { date: new Date().toLocaleDateString('ja-JP'), action: "初期登録", points: 0, timestamp: Date.now() }
-                        }
-                    };
-                    db.ref(`data/${currentUser}`).set(initialData);
-                }
-            }, (error) => {
-                console.error("Firebase Read Error:", error);
-                alert("データベース同期に失敗しました。");
-            });
-        }
-
-        function getStartOfWeekTimestamp() {
-            const now = new Date();
-            const dayOfWeek = now.getDay(); 
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - dayOfWeek);
-            startOfWeek.setHours(0, 0, 0, 0); 
-            return startOfWeek.getTime();
-        }
-
-        function calculateTotalStudyMinutes(historyArray) {
-            let totalMinutes = 0;
-            historyArray.forEach(item => {
-                if (item.action === '30分勉強' || item.action === '30分おべんきょう') {
-                    totalMinutes += 30;
-                } else if (item.action === '1時間勉強' || item.action === '1時間おべんきょう') {
-                    totalMinutes += 60;
-                } else if (item.action === '3時間勉強' || item.action === '3時間おべんきょう') {
-                    totalMinutes += 180;
-                } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
-                    const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
-                    const subMatch = item.action.match(/調整（勉強時間([\d.]+)h減）/);
-                    
-                    if (addMatch) {
-                        totalMinutes += (parseFloat(addMatch[1]) * 60);
-                    } else if (subMatch) {
-                        totalMinutes -= (parseFloat(subMatch[1]) * 60);
-                    }
-                } else if (item.action === '時間調整（勉強時間1h減）') {
-                    totalMinutes -= 60;
+                    db.ref(`data/${currentUser}`).set({ points: 0, history: { "init": { date: new Date().toLocaleDateString('ja-JP'), action: "初期登録", points: 0, timestamp: Date.now() } } });
                 }
             });
-            return totalMinutes < 0 ? 0 : totalMinutes;
-        }
-
-        function calculateWeeklyStudyMinutes(historyArray) {
-            const startOfWeekTime = getStartOfWeekTimestamp();
-            let weeklyMinutes = 0;
-
-            historyArray.forEach(item => {
-                const itemTime = item.timestamp ? item.timestamp : new Date(item.date).getTime();
-                
-                if (itemTime >= startOfWeekTime) {
-                    if (item.action === '30分勉強' || item.action === '30分おべんきょう') {
-                        weeklyMinutes += 30;
-                    } else if (item.action === '1時間勉強' || item.action === '1時間おべんきょう') {
-                        weeklyMinutes += 60;
-                    } else if (item.action === '3時間勉強' || item.action === '3時間おべんきょう') {
-                        weeklyMinutes += 180;
-                    } else if (item.action.includes('学習（') || item.action.includes('勉強時間')) {
-                        const addMatch = item.action.match(/学習（([\d.]+)h加算）/);
-                        const subMatch = item.action.match(/調整（勉強時間([\d.]+)h減）/);
-                        
-                        if (addMatch) {
-                            weeklyMinutes += (parseFloat(addMatch[1]) * 60);
-                        } else if (subMatch) {
-                            weeklyMinutes -= (parseFloat(subMatch[1]) * 60);
-                        }
-                    } else if (item.action === '時間調整（勉強時間1h減）') {
-                        weeklyMinutes -= 60;
-                    }
-                }
-            });
-            return weeklyMinutes < 0 ? 0 : weeklyMinutes;
         }
 
         function renderUI(points, historyMap) {
             document.getElementById("points-display").innerText = points;
+            const historyList = Object.keys(historyMap).map(key => ({ key, ...historyMap[key] }));
+            
+            // 勉強時間集計
+            let totalMinutes = 0;
+            let weeklyMinutes = 0;
+            const startOfWeek = new Date();
+            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+            startOfWeek.setHours(0,0,0,0);
 
-            const historyList = Object.keys(historyMap).map(key => ({
-                key: key,
-                ...historyMap[key]
-            }));
+            historyList.forEach(item => {
+                if (item.action.includes('学習')) {
+                    const match = item.action.match(/学習（([\d.]+)h加算）/);
+                    if (match) {
+                        const mins = parseFloat(match[1]) * 60;
+                        totalMinutes += mins;
+                        if ((item.timestamp || 0) >= startOfWeek.getTime()) weeklyMinutes += mins;
+                    }
+                }
+            });
 
-            const totalMinutes = calculateTotalStudyMinutes(historyList);
             const hours = Math.floor(totalMinutes / 60);
-            const minutes = totalMinutes % 60;
-            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById("total-study-display").innerText = `${hours}h ${formattedMinutes}m`;
+            const minutes = Math.floor(totalMinutes % 60);
+            document.getElementById("total-study-display").innerText = `${hours}h ${minutes < 10 ? '0' + minutes : minutes}m`;
 
-            const weeklyMinutes = calculateWeeklyStudyMinutes(historyList);
-            const weeklyHoursFloat = weeklyMinutes / 60;
-            let percent = Math.floor((weeklyHoursFloat / GOAL_HOURS) * 100);
+            let percent = Math.floor(((weeklyMinutes / 60) / GOAL_HOURS) * 100);
             if (percent > 100) percent = 100;
             document.getElementById("progress-bar-fill").style.width = `${percent}%`;
             document.getElementById("progress-percent-label").innerText = `${percent}%`;
 
-            const historyContainer = document.getElementById("history-container");
-            historyContainer.innerHTML = "";
-            const reversedHistory = [...historyList].reverse();
-            reversedHistory.forEach(item => {
+            // 履歴表示
+            const container = document.getElementById("history-container");
+            container.innerHTML = "";
+            [...historyList].reverse().forEach(item => {
                 if (item.key === "init") return;
-
                 const li = document.createElement("li");
                 li.className = "history-item";
-                
-                let ptText = item.points > 0 ? `+${item.points}pt` : `${item.points}pt`;
-                if (item.points === 0) ptText = "";
-                
                 li.innerHTML = `
-                    <div class="history-left">
-                        <span style="color: var(--text-color); font-weight: 700;">${item.action}</span>
-                        <span style="font-size: 0.7rem; color: var(--text-muted);">${item.date}</span>
-                    </div>
-                    <div class="history-right">
-                        <span class="pt-badge" style="color:${item.points > 0 ? '#ff5c83' : 'var(--text-muted)'}">${ptText}</span>
-                        <button class="btn-delete-log" onclick="deleteHistoryItem('${item.key}')" title="この記録を取り消す">🗑️</button>
-                    </div>
+                    <div><div>${item.action}</div><small style="color:var(--text-muted)">${item.date}</small></div>
+                    <div><span style="color:var(--dark-pink); font-family:var(--font-eng); margin-right:8px">${item.points > 0 ? '+' : ''}${item.points}pt</span>
+                    <button class="btn-delete-log" onclick="deleteHistoryItem('${item.key}')">🗑️</button></div>
                 `;
-                historyContainer.appendChild(li);
+                container.appendChild(li);
             });
         }
 
         function updatePoints(amount, actionName) {
             if (amount < 0 && currentPoints + amount < 0) {
-                alert("累積ポイントの残高が不足しています。");
+                alert("ポイントがたりません！");
                 return;
             }
-
-            autoCreateBackup();
-
-            const today = new Date().toLocaleDateString('ja-JP');
-            const nowTimestamp = Date.now(); 
-            const newPoints = currentPoints + amount;
-
-            const newHistoryItem = {
-                date: today,
-                timestamp: nowTimestamp,
-                action: actionName,
-                points: amount
-            };
-
-            db.ref(`data/${currentUser}`).transaction((currentData) => {
-                if (currentData) {
-                    currentData.points = newPoints;
-                    if (!currentData.history) {
-                        currentData.history = {};
-                    }
-                    const newKey = db.ref().child(`data/${currentUser}/history`).push().key;
-                    currentData.history[newKey] = newHistoryItem;
+            const newKey = db.ref().child(`data/${currentUser}/history`).push().key;
+            db.ref(`data/${currentUser}`).transaction(data => {
+                if (data) {
+                    data.points = (data.points || 0) + amount;
+                    if (!data.history) data.history = {};
+                    data.history[newKey] = { date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: actionName, points: amount };
                 }
-                return currentData;
-            }).catch((err) => {
-                console.error("Transaction Error:", err);
-                alert("データの保存に失敗しました。");
+                return data;
             });
-        }
-
-        function deleteHistoryItem(itemKey) {
-            const targetItem = rawHistoryMap[itemKey];
-            if (!targetItem) return;
-
-            autoCreateBackup();
-            const pointRefund = -targetItem.points;
-
-            if (currentPoints + pointRefund < 0) {
-                alert("この履歴を削除すると累積ポイントがマイナスになるため、取り消せません。");
-                return;
-            }
-
-            db.ref(`data/${currentUser}`).transaction((currentData) => {
-                if (currentData) {
-                    currentData.points = currentData.points + pointRefund;
-                    if (currentData.history && currentData.history[itemKey]) {
-                        delete currentData.history[itemKey];
-                    }
-                }
-                return currentData;
-            }).then(() => {
-                alert("指定された履歴を消去し、ポイントを巻き戻しました。");
-            }).catch((err) => {
-                console.error("Delete History Item Error:", err);
-                alert("履歴の消去に失敗しました。");
-            });
-        }
-
-        function autoCreateBackup(isResetting = false) {
-            if (!db) return;
-            if (!isResetting && currentPoints === 0 && Object.keys(rawHistoryMap).length <= 1) {
-                return; 
-            }
-
-            return db.ref(`data/${currentUser}`).once("value").then((snapshot) => {
-                const currentVal = snapshot.val();
-                if (!currentVal) return;
-
-                const now = new Date();
-                const userName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
-                const labelSuffix = isResetting ? ` (初期化直前)` : ` (${userName}自動保存)`;
-                const backupName = now.toLocaleString('ja-JP', { hour12: false }) + labelSuffix;
-                
-                const backupData = {
-                    timestamp: Date.now(),
-                    label: backupName,
-                    user: currentUser,
-                    dataState: currentVal
-                };
-
-                return db.ref(`backups/${currentUser}`).push(backupData).then(() => {
-                    return db.ref(`backups/${currentUser}`).orderByChild("timestamp").once("value", (snap) => {
-                        const backups = [];
-                        snap.forEach((child) => {
-                            backups.push({ key: child.key, ...child.val() });
-                        });
-                        if (backups.length > 3) {
-                            const deleteCount = backups.length - 3;
-                            for (let i = 0; i < deleteCount; i++) {
-                                db.ref(`backups/${currentUser}/${backups[i].key}`).remove();
-                            }
-                        }
-                    });
-                });
-            });
-        }
-
-        function showBackupListModal() {
-            const listContainer = document.getElementById("backup-list");
-            listContainer.innerHTML = '<div style="text-align: center; padding: 20px 0; font-size: 0.8rem; color: var(--text-muted);">ロード中...</div>';
-
-            db.ref(`backups/${currentUser}`).orderByChild("timestamp").once("value", (snapshot) => {
-                listContainer.innerHTML = "";
-                const backups = [];
-                snapshot.forEach((child) => {
-                    backups.push({ key: child.key, ...child.val() });
-                });
-
-                if (backups.length === 0) {
-                    listContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.8rem;">バックアップデータがありません。</div>';
-                    document.getElementById("backup-modal").style.display = "flex";
-                    return;
-                }
-
-                backups.reverse();
-                backups.forEach((bk) => {
-                    const div = document.createElement("div");
-                    div.className = "backup-item";
-                    const pts = bk.dataState.points || 0;
-                    
-                    div.innerHTML = `
-                        <div class="backup-info">
-                            <span style="font-weight:700; color:var(--text-color);">${bk.label}</span>
-                            <span style="color:var(--text-muted); font-size:0.65rem;">保有ポイント: ${pts} pt</span>
-                        </div>
-                        <button class="backup-restore-btn" onclick="restoreFromBackup('${bk.key}')">復元</button>
-                    `;
-                    listContainer.appendChild(div);
-                });
-
-                document.getElementById("backup-modal").style.display = "flex";
-            });
-        }
-
-        function restoreFromBackup(backupKey) {
-            if (!confirm("本当にこの時点のデータに復元しますか？\n現在のデータは上書きされます。")) {
-                return;
-            }
-
-            db.ref(`backups/${currentUser}/${backupKey}`).once("value").then((snapshot) => {
-                const backupObj = snapshot.val();
-                if (!backupObj || !backupObj.dataState) {
-                    alert("バックアップの読み込みに失敗しました。");
-                    return;
-                }
-
-                db.ref(`data/${currentUser}`).set(backupObj.dataState)
-                    .then(() => {
-                        alert("バックアップからデータを復旧しました！");
-                        closeBackupModal();
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        alert("復元に失敗しました。");
-                    });
-            });
-        }
-
-        function closeBackupModal() {
-            document.getElementById("backup-modal").style.display = "none";
-        }
-
-        function updateStudyLabel(val) {
-            document.getElementById("study-val-label").innerText = `+${val} pt`;
         }
 
         function executeStudy() {
             const val = parseFloat(document.getElementById("study-range").value);
             updatePoints(val, `学習（${val}h加算）`);
-            resetSlider("study-range", 1, "study-val-label", "+1 pt");
-        }
-
-        function updateRewardLabel(val) {
-            document.getElementById("reward-val-label").innerText = `-${val} pt`;
         }
 
         function executeReward() {
             const val = parseInt(document.getElementById("reward-range").value, 10);
             updatePoints(-val, `ご褒美使用 (-${val}pt)`);
-            resetSlider("reward-range", 1, "reward-val-label", "-1 pt");
         }
 
-        function updateAdjustLabel(val) {
-            document.getElementById("adjust-val-label").innerText = `-${val} pt`;
-        }
-
-        function executeAdjust() {
-            const val = parseFloat(document.getElementById("adjust-range").value);
-            updatePoints(-val, `調整（勉強時間${val}h減）`);
-            resetSlider("adjust-range", 0.5, "adjust-val-label", "-0.5 pt");
-        }
-
-        function resetSlider(sliderId, defaultValue, badgeId, defaultBadgeText) {
-            const slider = document.getElementById(sliderId);
-            if (slider) slider.value = defaultValue;
-            const badge = document.getElementById(badgeId);
-            if (badge) badge.innerText = defaultBadgeText;
+        function deleteHistoryItem(itemKey) {
+            db.ref(`data/${currentUser}/history/${itemKey}`).once("value").then(snap => {
+                const item = snap.val();
+                if (!item) return;
+                if (currentPoints - item.points < 0) {
+                    alert("この履歴を消すとポイントがマイナスになってしまいます！");
+                    return;
+                }
+                db.ref(`data/${currentUser}`).transaction(data => {
+                    if (data) {
+                        data.points -= item.points;
+                        if (data.history) delete data.history[itemKey];
+                    }
+                    return data;
+                });
+            });
         }
 
         function triggerResetFlow() {
-            const targetName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
-            document.querySelector("#confirm-modal .modal-desc").innerText = `${targetName}のポイント、合計学習時間、すべての履歴を含むデータベースを完全に初期化します。リセット直前に自動バックアップされます。`;
-            document.getElementById("confirm-modal").style.display = "flex";
-        }
-
-        function closeConfirmModal() {
-            document.getElementById("confirm-modal").style.display = "none";
-        }
-
-        function openPasswordModal(actionType) {
-            closeConfirmModal();
-            pendingActionType = actionType;
-            document.getElementById("reset-pass-input").value = ""; 
-            
-            const confirmBtn = document.getElementById("pwd-modal-confirm-btn");
-            if (actionType === 'reset') {
-                confirmBtn.onclick = executeReset;
-            } else if (actionType === 'backup') {
-                confirmBtn.onclick = executeOpenBackup;
-            }
-            
-            document.getElementById("password-modal").style.display = "flex";
-        }
-
-        function closePasswordModal() {
-            document.getElementById("password-modal").style.display = "none";
-        }
-
-        function executeOpenBackup() {
-            const resetInputEl = document.getElementById("reset-pass-input");
-            const passInput = resetInputEl.value;
-
-            if (passInput === SECRET_PASSWORD) {
-                closePasswordModal();
-                showBackupListModal();
-            } else {
-                alert("認証エラー：管理者パスワードが一致しません。");
-                resetInputEl.value = "";
-                setTimeout(() => {
-                    resetInputEl.focus();
-                }, 50);
-            }
-        }
-
-        function executeReset() {
-            const resetInputEl = document.getElementById("reset-pass-input");
-            const passInput = resetInputEl.value;
-            
-            if (passInput === SECRET_PASSWORD) {
-                closePasswordModal();
-                
-                autoCreateBackup(true).then(() => {
-                    db.ref(`data/${currentUser}`).remove()
-                        .then(() => {
-                            const targetName = currentUser === 'ayaki' ? 'あやき' : 'あゆ';
-                            alert(`初期化前に${targetName}の最新バックアップを作成し、データをリセットしました。`);
-                        })
-                        .catch((error) => {
-                            console.error("Reset Failed:", error);
-                            alert("データベースの消去に失敗しました。");
-                        });
-                }).catch((err) => {
-                    console.error("Backup before reset failed:", err);
-                    alert("事前バックアップに失敗したため、安全を考慮して初期化を中断しました。");
-                });
-            } else {
-                alert("認証エラー：管理者パスワードが一致しません。");
-                resetInputEl.value = "";
-                setTimeout(() => {
-                    resetInputEl.focus();
-                }, 50);
+            if (confirm("本当に初期化しますか？履歴がすべて消去されます。")) {
+                db.ref(`data/${currentUser}`).remove().then(() => alert("初期化しました。"));
             }
         }
     </script>
