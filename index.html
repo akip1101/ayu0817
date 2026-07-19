@@ -52,7 +52,6 @@
             z-index: 2000;
             transition: opacity 0.5s ease;
         }
-        /* ふんわりとした可愛いピンクホワイトのフィルター */
         #lock-screen::before {
             content: '';
             position: absolute;
@@ -86,9 +85,7 @@
             box-shadow: inset 0 2px 4px rgba(255, 143, 169, 0.05);
             transition: border-color 0.2s;
         }
-        #lock-screen input:focus {
-            border-color: var(--main-pink);
-        }
+        #lock-screen input:focus { border-color: var(--main-pink); }
         #lock-screen button {
             background-color: var(--main-pink); color: white; border: none;
             padding: 14px 60px; border-radius: 30px; font-size: 1rem;
@@ -96,9 +93,7 @@
             box-shadow: 0 6px 14px rgba(255, 143, 169, 0.3);
             transition: transform 0.1s, background-color 0.2s;
         }
-        #lock-screen button:active {
-            transform: scale(0.98);
-        }
+        #lock-screen button:active { transform: scale(0.98); }
 
         /* 🎀 ナビゲーション */
         .sidebar {
@@ -127,9 +122,7 @@
             background-color: white;
             transition: transform 0.2s;
         }
-        .nav-item:hover .nav-icon-img {
-            transform: scale(1.05);
-        }
+        .nav-item:hover .nav-icon-img { transform: scale(1.05); }
         .bottom-nav { display: none; }
 
         /* 🏠 メインレイアウト */
@@ -138,10 +131,8 @@
             padding: 25px; box-sizing: border-box; width: calc(100% - 110px);
         }
 
-        /* 👑 ヘッダーエリア */
         .header-section { text-align: center; margin-bottom: 25px; }
 
-        /* 👥 ユーザー切り替えタブ */
         .user-tabs {
             display: flex; background: #ffffff; border-radius: 24px;
             padding: 5px; border: 2.5px solid var(--soft-pink); margin: 0 auto; max-width: 300px;
@@ -154,16 +145,13 @@
         }
         .tab-btn.active { background: var(--main-pink); color: white; box-shadow: 0 4px 10px rgba(255, 143, 169, 0.2); }
 
-        /* 📦 画面切り替え管理 */
         .view-content { display: none; }
         .view-content.active { display: block; }
 
-        /* 📊 ダッシュボードグリッド */
         .dashboard-grid {
             display: grid; grid-template-columns: 300px 1fr 300px; gap: 20px; align-items: start;
         }
 
-        /* 📝 ノート・カード基盤 */
         .notebook-card {
             background-color: var(--card-bg); border: 3px solid var(--soft-pink);
             border-radius: var(--border-radius); padding: 22px;
@@ -173,16 +161,13 @@
         .card-title { font-family: var(--font-main); font-size: 1.15rem; color: var(--dark-pink); margin: 0 0 6px 0; text-align: center; }
         .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 18px; }
 
-        /* コンテナ系 */
         .point-display-container { text-align: center; margin-bottom: 15px; background-color: var(--bg-color); padding: 14px; border-radius: 18px; }
         .point-val { font-size: 2.4rem; color: var(--dark-pink); font-family: var(--font-eng); margin: 0; }
         .study-time-val { font-size: 1.15rem; color: var(--text-color); margin: 0; }
 
-        /* 進捗バー */
         .progress-bar-bg { background: #ffe3e9; height: 14px; border-radius: 7px; width: 100%; overflow: hidden; margin-top: 6px; }
         .progress-bar-fill { background: linear-gradient(90deg, #ff9ebb, var(--main-pink)); height: 100%; width: 0%; border-radius: 7px; transition: width 0.5s ease; }
 
-        /* 入力フォーム・コントロール */
         .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
         label { font-size: 0.85rem; color: var(--text-color); margin-left: 4px; }
         input[type="text"], input[type="number"], select {
@@ -203,7 +188,6 @@
         .btn-execute:hover { background-color: var(--dark-pink); }
         .btn-execute:active { transform: scale(0.99); }
 
-        /* リスト・アイテム表示 */
         .item-list { list-style: none; padding: 0; margin: 0; }
         .list-entry {
             background: var(--bg-color); padding: 15px; border-radius: 16px;
@@ -216,11 +200,9 @@
         .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.5; transition: opacity 0.2s; }
         .btn-action:hover { opacity: 1; }
 
-        /* ⚙️ 下部管理セクション */
         .danger-zone { display: flex; justify-content: center; gap: 15px; margin: 30px 0 50px 0; }
         .btn-sub { background: #ffffff; border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
 
-        /* 📱 スマホ向けレスポンシブ設計 */
         @media (max-width: 900px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -239,7 +221,7 @@
 </head>
 <body>
 
-    <!-- ロック画面 (絵文字をなくして可愛くコンテナ化) -->
+    <!-- ロック画面 -->
     <div id="lock-screen">
         <div class="lock-container">
             <h2>ENTER PASSWORD</h2>
@@ -319,19 +301,14 @@
                     </div>
                 </section>
 
-                <!-- 中列: クイック勉強きろく -->
+                <!-- 中列: クイック勉強きろく (教科から自由記述に変更) -->
                 <section class="notebook-card">
                     <h3 class="card-title">勉強記録</h3>
                     <p class="card-subtitle">勉強時間をさくっと記録</p>
                     
                     <div class="form-group">
-                        <label>教科を選ぶ:</label>
-                        <select id="quick-subject">
-                            <option value="数学">数学</option>
-                            <option value="英語">英語</option>
-                            <option value="物理">物理</option>
-                            <option value="その他">その他</option>
-                        </select>
+                        <label>何をした？（内容・教材など）:</label>
+                        <input type="text" id="quick-content" placeholder="例: 数学の基礎問題、単語帳など">
                     </div>
                     <div class="form-group">
                         <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
@@ -356,7 +333,7 @@
         <!-- 🎁 ② ご褒美ストア画面 -->
         <div id="view-rewards" class="view-content">
             <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
-                <!-- 左側: ご褒美追加 (具体例を削除) -->
+                <!-- 左側: ご褒美作成 -->
                 <section class="notebook-card">
                     <h3 class="card-title">ご褒美作成</h3>
                     <p class="card-subtitle">新しいご褒美をつくる</p>
@@ -478,7 +455,9 @@
         }
 
         function submitQuickLog() {
-            const subject = document.getElementById("quick-subject").value;
+            let content = document.getElementById("quick-content").value.trim();
+            if(!content) { content = "べんきょう"; } // 空欄の場合はデフォルト値
+            
             const hours = parseFloat(document.getElementById("quick-hours").value);
             
             const newLogKey = db.ref().child(`data/${currentUser}/history`).push().key;
@@ -489,11 +468,13 @@
                     data.history[newLogKey] = {
                         date: new Date().toLocaleDateString('ja-JP'),
                         timestamp: Date.now(),
-                        action: `学習：${subject} (${hours}h)`,
+                        action: `学習：${content} (${hours}h)`,
                         points: hours
                     };
                 }
                 return data;
+            }, () => {
+                document.getElementById("quick-content").value = ""; // 入力欄をクリア
             });
         }
 
