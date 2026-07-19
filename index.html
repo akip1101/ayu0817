@@ -7,8 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -60,8 +62,7 @@
         .view-content.active { display: block; }
         
         .mobile-container { max-width: 600px; margin: 0 auto; width: 100%; }
-
-        .notebook-card { background-color: var(--card-bg); border: 3px solid var(--soft-pink); border-radius: var(--border-radius); padding: 22px; margin-bottom: 20px; }
+        .notebook-card { background-color: var(--card-bg); border: 3px solid var(--soft-pink); border-radius: var(--border-radius); padding: 22px; margin-bottom: 20px; position: relative; }
         .card-title { font-family: var(--font-main); font-size: 1.15rem; color: var(--dark-pink); margin: 0 0 6px 0; text-align: center; }
         .card-subtitle { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 18px; }
 
@@ -80,10 +81,11 @@
         
         .btn-execute { width: 100%; background-color: var(--main-pink); color: white; padding: 14px; border-radius: 16px; border: none; font-size: 1rem; cursor: pointer; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .btn-execute:active { transform: scale(0.98); }
-        .btn-sub { background: var(--card-bg); border: 2px solid var(--soft-pink); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-weight: 700; }
+        .btn-sub { background: var(--main-pink); color: white; border: none; padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #fff; font-weight: 700; }
         
         .item-list { list-style: none; padding: 0; margin: 0; }
         .list-entry { background: var(--bg-color); padding: 12px 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .entry-info { display: flex; flex-direction: column; gap: 4px; flex: 1; margin-right: 8px; }
         .entry-title { font-size: 0.9rem; color: var(--text-color); }
         .entry-meta { font-size: 0.75rem; color: var(--text-muted); }
         .btn-action { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.7; padding: 5px; }
@@ -130,7 +132,7 @@
             </div>
         </header>
 
-        <!-- 🏠 ダッシュボード画面 (1カラムレイアウト) -->
+        <!-- 🏠 ダッシュボード画面 -->
         <div id="view-dashboard" class="view-content active">
             <div class="mobile-container">
                 
@@ -174,11 +176,9 @@
                     <div class="form-group">
                         <label>科目・カテゴリ:</label>
                         <select id="quick-category-select"><option value="勉強">勉強</option></select>
-                        
-                        <!-- 🎀 ここに入力欄とボタンを追加します -->
                         <div style="display:flex; gap:5px; margin-top:8px;">
                             <input type="text" id="input-new-category-quick" placeholder="新しいカテゴリ" style="flex:1; padding:8px;">
-                            <button class="btn-sub" style="width: auto; padding: 8px 12px; font-size: 0.85rem;" onclick="addCustomCategoryFromQuick()">追加</button>
+                            <button class="btn-sub" onclick="addCustomCategoryFromQuick()">追加</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -253,429 +253,137 @@
                         <div class="tag-list" id="custom-tags-container"></div>
                     </div>
                 </section>
-                <div style="text-align: center; margin-top:30px;"><button class="btn-sub" style="color:red;" onclick="triggerResetFlow()">全データの初期化</button></div>
+                <div style="text-align: center; margin-top:30px;"><button class="btn-sub" style="color:red; background-color: transparent;" onclick="triggerResetFlow()">全データの初期化</button></div>
             </div>
         </div>
     </main>
 
     <script>
-        // === Firebase設定 ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw",
-            authDomain: "gohoubipt.firebaseapp.com",
-            databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "gohoubipt",
-            storageBucket: "gohoubipt.appspot.com",
-            messagingSenderId: "133130532450",
-            appId: "1:133130532450:web:41476b156bb892e62e833b"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw", authDomain: "gohoubipt.firebaseapp.com", databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "gohoubipt", storageBucket: "gohoubipt.appspot.com", messagingSenderId: "133130532450", appId: "1:133130532450:web:41476b156bb892e62e833b" };
+        const SECRET_PASSWORD = "ayu"; let db; let currentUser = 'ayu'; let currentPoints = 0; let currentGoal = 45; let dbListenerRef = null; let globalHistoryData = {};
 
-        const SECRET_PASSWORD = "ayu";
-        let db; let currentUser = 'ayu'; let currentPoints = 0; let currentGoal = 45; let dbListenerRef = null;
-        let globalHistoryData = {}; // グラフ描画用キャッシュ
+        function checkPassword() { if(document.getElementById("pass-input").value === SECRET_PASSWORD) { firebase.initializeApp(firebaseConfig); db = firebase.database(); document.getElementById("lock-screen").style.opacity = "0"; setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500); startListening(); } else alert("パスワードがちがいます！"); }
+        function switchView(viewName) { document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(btn => { if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active'); else btn.classList.remove('active'); }); if(viewName === 'analytics') renderCharts(); }
+        function switchUser(userKey) { if(currentUser === userKey) return; currentUser = userKey; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${userKey}`).classList.add('active'); if(dbListenerRef) dbListenerRef.off(); startListening(); }
+        function toggleDarkMode() { const body = document.body; body.classList.toggle('dark-mode'); const btn = document.getElementById('dark-mode-btn'); if(body.classList.contains('dark-mode')){ btn.innerText = "☀️ ライトモードに戻す"; btn.style.backgroundColor = "#c96788"; btn.style.color = "#fff"; } else { btn.innerText = "🌙 ダークモードをON"; btn.style.backgroundColor = "var(--soft-pink)"; btn.style.color = "var(--text-color)"; } if(document.getElementById('view-analytics').classList.contains('active')) renderCharts(); }
 
-        // === アプリ初期化 ===
-        function checkPassword() {
-            if (document.getElementById("pass-input").value === SECRET_PASSWORD) {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                document.getElementById("lock-screen").style.opacity = "0";
-                setTimeout(() => { document.getElementById("lock-screen").style.display = "none"; }, 500);
-                startListening();
-            } else { alert("パスワードがちがいます！"); }
-        }
-
-        // === ナビゲーション ===
-        function switchView(viewName) {
-            document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${viewName}`).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            if(viewName === 'analytics') renderCharts(); // レポート画面を開いたらグラフ描画
-        }
-
-        function switchUser(userKey) {
-            if (currentUser === userKey) return;
-            currentUser = userKey;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-${userKey}`).classList.add('active');
-            if (dbListenerRef) dbListenerRef.off();
-            startListening();
-        }
-
-        // === ダークモード切替 ===
-        function toggleDarkMode() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const btn = document.getElementById('dark-mode-btn');
-            if(body.classList.contains('dark-mode')){
-                btn.innerText = "☀️ ライトモードに戻す";
-                btn.style.backgroundColor = "#c96788";
-                btn.style.color = "#fff";
-            } else {
-                btn.innerText = "🌙 ダークモードをON";
-                btn.style.backgroundColor = "var(--soft-pink)";
-                btn.style.color = "var(--text-color)";
-            }
-            if(document.getElementById('view-analytics').classList.contains('active')) renderCharts();
-        }
-
-        // === タイマー機能 ===
         let timerSec = 0; let timerInterval = null;
-        function formatTime(s) {
-            const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); const sec = s%60;
-            return `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${sec<10?'0':''}${sec}`;
-        }
+        function formatTime(s) { const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); const sec = s%60; return `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${sec<10?'0':''}${sec}`; }
         function startTimer() { if(!timerInterval) timerInterval = setInterval(() => { timerSec++; document.getElementById('timer-display').innerText = formatTime(timerSec); }, 1000); }
         function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
         function resetTimer() { pauseTimer(); timerSec = 0; document.getElementById('timer-display').innerText = "00:00:00"; }
-        function logTimerTime() {
-            pauseTimer();
-            let hours = (timerSec / 3600).toFixed(1);
-            if(hours < 0.1) hours = 0.1; 
-            document.getElementById('quick-hours').value = hours;
-            updateQuickLabel(hours);
-            alert(`タイマーの記録（${hours}時間）をセットしました！\nカテゴリを選んで「記録を保存する」を押してください。`);
-            resetTimer();
-        }
+        function logTimerTime() { pauseTimer(); let hours = (timerSec / 3600).toFixed(1); if(hours < 0.1) hours = 0.1; document.getElementById('quick-hours').value = hours; updateQuickLabel(hours); alert(`タイマーの記録（${hours}時間）をセットしました！`); resetTimer(); }
 
-        // === Firebase リスナー ===
         function startListening() {
             dbListenerRef = db.ref(`data/${currentUser}`);
-            dbListenerRef.on("value", (snapshot) => {
-                const data = snapshot.val() || {};
-                currentPoints = data.points || 0; 
-                currentGoal = data.goalHours || 45;
-                globalHistoryData = data.history || {};
-
-                document.getElementById('dash-points').innerText = currentPoints;
-                document.getElementById('shop-points').innerText = currentPoints;
-                document.getElementById('input-goal-hours').value = currentGoal;
-
-                renderCategoryDropdown(data.categories || {});
-                renderCategorySettings(data.categories || {});
-                renderHistory(globalHistoryData);
-                renderRewards(data.rewardStore || {});
-                
-                // データが更新された時に分析タブが開いていたらグラフも更新
-                if(document.getElementById('view-analytics').classList.contains('active')) {
-                    renderCharts();
-                }
+            dbListenerRef.on("value", snap => {
+                const data = snap.val() || {}; currentPoints = data.points || 0; currentGoal = data.goalHours || 45; globalHistoryData = data.history || {};
+                document.getElementById('dash-points').innerText = currentPoints; document.getElementById('shop-points').innerText = currentPoints; document.getElementById('input-goal-hours').value = currentGoal;
+                renderCategoryDropdown(data.categories || {}); renderCategorySettings(data.categories || {}); renderHistory(globalHistoryData); renderRewards(data.rewardStore || {});
+                if(document.getElementById('view-analytics').classList.contains('active')) renderCharts();
             });
         }
 
-        // === カテゴリ管理 ===
-        function renderCategoryDropdown(catMap) {
-            const select = document.getElementById("quick-category-select"); select.innerHTML = "";
-            const list = Object.keys(catMap).length > 0 ? Object.values(catMap) : ["勉強"];
-            list.forEach(cat => { const opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
-        }
-        function renderCategorySettings(catMap) {
-            const container = document.getElementById("custom-tags-container"); container.innerHTML = "";
-            const entries = Object.keys(catMap).map(k => ({key: k, name: catMap[k]}));
-            if(entries.length === 0) { container.innerHTML = `<p style="font-size:0.75rem;">デフォルトが適用されています。</p>`; return; }
-            entries.forEach(item => {
-                const badge = document.createElement("div"); badge.className = "tag-badge";
-                badge.innerHTML = `<span>${item.name}</span><span style="cursor:pointer;" onclick="deleteCustomCategory('${item.key}')">✕</span>`;
-                container.appendChild(badge);
-            });
-        }
-        function addCustomCategory() {
-            const val = document.getElementById("input-new-category").value.trim();
-            if(val) db.ref().child(`data/${currentUser}/categories`).push().set(val).then(()=>document.getElementById("input-new-category").value="");
-        }
-        function addCustomCategoryFromQuick() {
-            const input = document.getElementById("input-new-category-quick");
-            if(!input) return;
-            const val = input.value.trim();
-            if(val) db.ref().child(`data/${currentUser}/categories`).push().set(val).then(() => { input.value = ""; alert("カテゴリを追加しました！"); });
-        }
+        function renderCategoryDropdown(catMap) { const select = document.getElementById("quick-category-select"); select.innerHTML = ""; const list = Object.keys(catMap).length > 0 ? Object.values(catMap) : ["勉強"]; list.forEach(cat => { const opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); }); }
+        function renderCategorySettings(catMap) { const container = document.getElementById("custom-tags-container"); container.innerHTML = ""; const entries = Object.keys(catMap).map(k => ({key: k, name: catMap[k]})); if(entries.length === 0) return container.innerHTML = `<p style="font-size:0.75rem;">デフォルトが適用されています。</p>`; entries.forEach(item => { const badge = document.createElement("div"); badge.className = "tag-badge"; badge.innerHTML = `<span>${item.name}</span><span style="cursor:pointer;" onclick="deleteCustomCategory('${item.key}')">✕</span>`; container.appendChild(badge); }); }
+        function addCustomCategory() { const val = document.getElementById("input-new-category").value.trim(); if(val) db.ref().child(`data/${currentUser}/categories`).push().set(val).then(()=>document.getElementById("input-new-category").value=""); }
+        function addCustomCategoryFromQuick() { const input = document.getElementById("input-new-category-quick"); if(!input) return; const val = input.value.trim(); if(val) db.ref().child(`data/${currentUser}/categories`).push().set(val).then(() => { input.value = ""; alert("カテゴリを追加しました！"); }); }
         function deleteCustomCategory(key) { db.ref(`data/${currentUser}/categories/${key}`).remove(); }
 
-        // === 記録処理 ===
         function updateQuickLabel(val) { document.getElementById('quick-hours-label').innerText = `${val}時間 (+${val}pt)`; }
-        function submitQuickLog() {
-            const content = document.getElementById("quick-category-select").value || "勉強";
-            const hours = parseFloat(document.getElementById("quick-hours").value);
-            const newKey = db.ref().child(`data/${currentUser}/history`).push().key;
-            db.ref(`data/${currentUser}`).transaction(data => {
-                if (data) {
-                    data.points = (data.points || 0) + hours;
-                    if (!data.history) data.history = {};
-                    data.history[newKey] = { 
-                        date: new Date().toLocaleDateString('ja-JP'), 
-                        timestamp: Date.now(), 
-                        action: `学習：${content} (${hours}h)`, 
-                        points: hours 
-                    };
-                }
-                return data;
-            });
-        }
+        function submitQuickLog() { const content = document.getElementById("quick-category-select").value || "勉強"; const hours = parseFloat(document.getElementById("quick-hours").value); const newKey = db.ref().child(`data/${currentUser}/history`).push().key; db.ref(`data/${currentUser}`).transaction(d => { if(d) { d.points = (d.points||0)+hours; if(!d.history) d.history={}; d.history[newKey] = {date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: `学習：${content} (${hours}h)`, points: hours}; } return d; }); }
 
-        // === 履歴リストと編集 ===
         function renderHistory(hMap) {
-            const container = document.getElementById("dash-history-list"); container.innerHTML = "";
-            let totalMins = 0; let weeklyMins = 0;
+            const container = document.getElementById("dash-history-list"); container.innerHTML = ""; let totalMins = 0; let weeklyMins = 0;
             const startOfWeek = new Date(); startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); startOfWeek.setHours(0,0,0,0);
-            
             const list = Object.keys(hMap).map(k => ({key: k, ...hMap[k]}));
             
-            list.forEach(item => {
-                if(item.action && item.action.includes('学習')) {
-                    const match = item.action.match(/([\d.]+)h/);
-                    if(match) {
-                        const mins = parseFloat(match[1]) * 60;
-                        totalMins += mins;
-                        // timestampがない古いデータへの対策
+            list.forEach(item => { 
+                if(item.action && item.action.includes('学習')) { 
+                    const match = item.action.match(/([\d.]+)h/); 
+                    if(match){ 
+                        const mins = parseFloat(match[1])*60; totalMins += mins; 
                         let ts = item.timestamp || (item.date ? new Date(item.date).getTime() : 0);
-                        if(ts >= startOfWeek.getTime()) weeklyMins += mins;
-                    }
-                }
+                        if(ts >= startOfWeek.getTime()) weeklyMins += mins; 
+                    } 
+                } 
             });
-
-            const h = Math.floor(totalMins / 60); const m = Math.floor(totalMins % 60);
-            document.getElementById("dash-study-time").innerText = `${h}h ${m<10?'0':''}${m}m`;
-
-            let p = Math.floor(((weeklyMins/60) / currentGoal) * 100); if(p > 100) p = 100;
-            document.getElementById("dash-progress-bar").style.width = `${p}%`; document.getElementById("dash-progress-text").innerText = `${p}%`;
-
-            list.reverse().forEach(item => {
-                const li = document.createElement("li"); li.className = "list-entry";
-                
+            
+            const h = Math.floor(totalMins/60); const m = Math.floor(totalMins%60); document.getElementById("dash-study-time").innerText = `${h}h ${m<10?'0':''}${m}m`;
+            let p = Math.floor(((weeklyMins/60)/currentGoal)*100); if(p>100) p=100; document.getElementById("dash-progress-bar").style.width = `${p}%`; document.getElementById("dash-progress-text").innerText = `${p}%`;
+            
+            list.reverse().forEach(item => { 
+                const li = document.createElement("li"); li.className = "list-entry"; 
                 const isStudyLog = item.action && item.action.includes('学習');
                 const editBtn = isStudyLog ? `<button class="btn-action" onclick="editHistory('${item.key}')">✏️</button>` : '';
-
-                li.innerHTML = `
-                    <div class="entry-info">
-                        <span class="entry-title">${item.action}</span>
-                        <span class="entry-meta">${item.date}</span>
-                    </div>
-                    <div style="display:flex; align-items:center;">
-                        <span style="color:var(--dark-pink); margin-right:8px;">${item.points > 0 ? '+' : ''}${item.points}pt</span>
-                        ${editBtn}
-                        <button class="btn-action" onclick="deleteHistory('${item.key}')">🗑️</button>
-                    </div>`;
-                container.appendChild(li);
+                li.innerHTML = `<div class="entry-info"><span class="entry-title">${item.action}</span><span class="entry-meta">${item.date}</span></div><div><span style="color:var(--dark-pink); margin-right:8px;">${item.points>0?'+':''}${item.points}pt</span>${editBtn}<button class="btn-action" onclick="deleteHistory('${item.key}')">🗑️</button></div>`; 
+                container.appendChild(li); 
             });
         }
 
         function editHistory(key) {
             db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => {
                 const item = snap.val(); if(!item) return;
-                
-                let currentCat = "勉強";
-                const catMatch = item.action.match(/学習：(.+?)\s*\(/);
-                if(catMatch) currentCat = catMatch[1];
-                
-                const newCat = prompt("新しい科目・カテゴリ名:", currentCat);
-                if(!newCat) return;
-                
-                const newHoursStr = prompt("新しい勉強時間（例: 1.5）:", item.points);
-                if(!newHoursStr) return;
-                
-                const newHours = parseFloat(newHoursStr);
-                if(isNaN(newHours) || newHours <= 0) return alert("正しい数値を入力してください。");
-
-                db.ref(`data/${currentUser}`).transaction(d => {
-                    if(d && d.history[key]) {
-                        const diff = newHours - item.points;
-                        if((d.points || 0) + diff < 0) { alert("ポイントがマイナスになるため変更できません！"); return d; }
-                        d.points = (d.points || 0) + diff;
-                        d.history[key].action = `学習：${newCat.trim()} (${newHours}h)`;
-                        d.history[key].points = newHours;
-                    }
-                    return d;
-                });
+                let currentCat = "勉強"; const catMatch = item.action.match(/学習：(.+?)\s*\(/); if(catMatch) currentCat = catMatch[1];
+                const newCat = prompt("新しい科目・カテゴリ名:", currentCat); if(!newCat) return;
+                const newHoursStr = prompt("新しい勉強時間（例: 1.5）:", item.points); if(!newHoursStr) return;
+                const newHours = parseFloat(newHoursStr); if(isNaN(newHours) || newHours <= 0) return alert("正しい数値を入力してください。");
+                db.ref(`data/${currentUser}`).transaction(d => { if(d && d.history[key]) { const diff = newHours - item.points; if((d.points || 0) + diff < 0) { alert("ポイントがマイナスになるため変更できません！"); return d; } d.points = (d.points || 0) + diff; d.history[key].action = `学習：${newCat.trim()} (${newHours}h)`; d.history[key].points = newHours; } return d; });
             });
         }
 
-        function deleteHistory(key) {
-            db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => {
-                const item = snap.val(); if(!item) return;
-                if(currentPoints - item.points < 0) return alert("ポイントがマイナスになるため削除できません！");
-                db.ref(`data/${currentUser}`).transaction(d => { if(d){ d.points -= item.points; if(d.history) delete d.history[key]; } return d; });
-            });
-        }
+        function deleteHistory(key) { db.ref(`data/${currentUser}/history/${key}`).once("value").then(snap => { const item = snap.val(); if(!item) return; if(currentPoints - item.points < 0) return alert("ポイントがマイナスになるため削除できません！"); db.ref(`data/${currentUser}`).transaction(d => { if(d){ d.points -= item.points; if(d.history) delete d.history[key]; } return d; }); }); }
 
-        // === ご褒美ストア ===
-        function submitRewardItem() {
-            const name = document.getElementById("reward-name").value.trim(); const cost = parseInt(document.getElementById("reward-cost").value, 10);
-            if(name && cost>0) db.ref().child(`data/${currentUser}/rewardStore`).push().set({name, cost}).then(()=>{ document.getElementById("reward-name").value=""; });
-        }
-        function renderRewards(sMap) {
-            const container = document.getElementById("shop-container"); container.innerHTML = "";
-            Object.keys(sMap).forEach(key => {
-                const item = sMap[key]; const card = document.createElement("div"); 
-                card.style.background = "var(--bg-color)"; card.style.padding = "15px"; card.style.borderRadius = "16px"; card.style.textAlign = "center"; card.style.position = "relative";
-                card.innerHTML = `
-                    <div style="font-size:0.9rem;">${item.name}</div>
-                    <div style="font-size:1.1rem; color:var(--dark-pink); margin:5px 0;">${item.cost}pt</div>
-                    <button class="btn-execute" style="padding:6px; font-size:0.8rem;" onclick="exchangeReward('${item.name}', ${item.cost})">交換</button>
-                    <button class="btn-action" style="position:absolute; top:2px; right:2px; padding:2px;" onclick="db.ref('data/${currentUser}/rewardStore/${key}').remove()">✕</button>`;
-                container.appendChild(card);
-            });
-        }
-        function exchangeReward(name, cost) {
-            if(currentPoints < cost) return alert("ポイント不足です！");
-            if(confirm(`「${name}」を交換しますか？`)) {
-                const k = db.ref().child(`data/${currentUser}/history`).push().key;
-                db.ref(`data/${currentUser}`).transaction(d => {
-                    if(d){ d.points -= cost; if(!d.history) d.history={}; d.history[k] = {date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: `交換：${name}`, points: -cost}; }
-                    return d;
-                });
-            }
-        }
+        function submitRewardItem() { const name = document.getElementById("reward-name").value.trim(); const cost = parseInt(document.getElementById("reward-cost").value, 10); if(name && cost>0) db.ref().child(`data/${currentUser}/rewardStore`).push().set({name, cost}).then(()=>{ document.getElementById("reward-name").value=""; }); }
+        function renderRewards(sMap) { const container = document.getElementById("shop-container"); container.innerHTML = ""; Object.keys(sMap).forEach(key => { const item = sMap[key]; const card = document.createElement("div"); card.style.background = "var(--bg-color)"; card.style.padding = "15px"; card.style.borderRadius = "16px"; card.style.textAlign = "center"; card.style.position = "relative"; card.innerHTML = `<div style="font-size:0.9rem;">${item.name}</div><div style="font-size:1.1rem; color:var(--dark-pink); margin:5px 0;">${item.cost}pt</div><button class="btn-execute" style="padding:6px; font-size:0.8rem;" onclick="exchangeReward('${item.name}', ${item.cost})">交換</button><button class="btn-action" style="position:absolute; top:2px; right:2px; padding:2px;" onclick="db.ref('data/${currentUser}/rewardStore/${key}').remove()">✕</button>`; container.appendChild(card); }); }
+        function exchangeReward(name, cost) { if(currentPoints < cost) return alert("ポイント不足です！"); if(confirm(`「${name}」を交換しますか？`)) { const k = db.ref().child(`data/${currentUser}/history`).push().key; db.ref(`data/${currentUser}`).transaction(d => { if(d){ d.points -= cost; if(!d.history) d.history={}; d.history[k] = {date: new Date().toLocaleDateString('ja-JP'), timestamp: Date.now(), action: `交換：${name}`, points: -cost}; } return d; }); } }
         function submitGoalSettings() { db.ref(`data/${currentUser}/goalHours`).set(parseInt(document.getElementById("input-goal-hours").value, 10)); alert("目標を保存しました！"); }
         function triggerResetFlow() { if(confirm("全データを初期化しますか？")) db.ref(`data/${currentUser}`).remove(); }
 
-        // === 📊 チャート（グラフ）描画ロジック ===
         let barChartInstance = null; let pieChartInstance = null;
-        
         function renderCharts() {
-            const periodEl = document.getElementById("chart-period");
-            if(!periodEl) return;
-            const daysToLookBack = parseInt(periodEl.value, 10);
-            
-            const now = new Date();
-            now.setHours(23, 59, 59, 999);
+            const periodEl = document.getElementById("chart-period"); if(!periodEl) return;
+            const daysToLookBack = parseInt(periodEl.value, 10); const now = new Date(); now.setHours(23, 59, 59, 999);
             const timeLimit = now.getTime() - (daysToLookBack * 24 * 60 * 60 * 1000);
-            
             let dateMap = {}; let catMap = {};
             
-            for(let i = daysToLookBack - 1; i >= 0; i--) {
-                let d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-                dateMap[`${d.getMonth()+1}/${d.getDate()}`] = 0;
-            }
+            for(let i = daysToLookBack - 1; i >= 0; i--) { let d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000); dateMap[`${d.getMonth()+1}/${d.getDate()}`] = 0; }
 
             Object.keys(globalHistoryData).forEach(key => {
                 const item = globalHistoryData[key];
                 if(item.action && item.action.includes('学習')) {
-                    let ts = item.timestamp;
-                    if(!ts && item.date) ts = new Date(item.date).getTime();
-                    
+                    let ts = item.timestamp || (item.date ? new Date(item.date).getTime() : 0);
                     if(ts >= timeLimit) {
-                        // 🎀 どんな形式の「学習」ログからでも時間を抜き出せるようにパワーアップ
                         let h = 0;
-                        const matchFormat1 = item.action.match(/([\d.]+)h/);      // 「(1.0h)」や「(1.0h加算)」に対応
-                        const matchFormat2 = item.action.match(/（([\d.]+)h加算）/); // 全角の「（1.0h加算）」に対応
-                        
-                        if (matchFormat1) {
-                            h = parseFloat(matchFormat1[1]);
-                        } else if (matchFormat2) {
-                            h = parseFloat(matchFormat2[1]);
-                        }
+                        const matchFormat1 = item.action.match(/([\d.]+)h/);
+                        const matchFormat2 = item.action.match(/（([\d.]+)h加算）/);
+                        if (matchFormat1) h = parseFloat(matchFormat1[1]);
+                        else if (matchFormat2) h = parseFloat(matchFormat2[1]);
 
-                        // 科目名の切り出し
-                        let cat = "勉強";
-                        const matchCat = item.action.match(/学習：(.+?)\s*\(/);
-                        if(matchCat) {
-                            cat = matchCat[1];
-                        }
+                        let cat = "勉強"; const matchCat = item.action.match(/学習：(.+?)\s*\(/); if(matchCat) cat = matchCat[1];
 
                         if(h > 0) {
-                            const d = new Date(ts);
-                            const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-                            
-                            if(dateMap[dateStr] !== undefined) {
-                                dateMap[dateStr] += h;
-                            }
+                            const d = new Date(ts); const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+                            if(dateMap[dateStr] !== undefined) dateMap[dateStr] += h;
                             catMap[cat] = (catMap[cat] || 0) + h;
                         }
                     }
                 }
             });
 
-            const isDark = document.body.classList.contains('dark-mode');
-            const textColor = isDark ? '#fce4e8' : '#5a4b4e';
-            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-            const barColor = isDark ? '#e07b9e' : '#ff8fa9';
-            const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
+            const isDark = document.body.classList.contains('dark-mode'); const textColor = isDark ? '#fce4e8' : '#5a4b4e'; const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'; const barColor = isDark ? '#e07b9e' : '#ff8fa9'; const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
 
             const barCtx = document.getElementById('barChart');
             if(barCtx) {
                 if(barChartInstance) barChartInstance.destroy();
-                barChartInstance = new Chart(barCtx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(dateMap),
-                        datasets: [{ label: '学習時間 (h)', data: Object.values(dateMap), backgroundColor: barColor, borderRadius: 4 }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } },
-                        plugins: { legend: { labels: { color: textColor } } }
-                    }
-                });
+                barChartInstance = new Chart(barCtx.getContext('2d'), { type: 'bar', data: { labels: Object.keys(dateMap), datasets: [{ label: '学習時間 (h)', data: Object.values(dateMap), backgroundColor: barColor, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } }, plugins: { legend: { labels: { color: textColor } } } } });
             }
 
             const pieCtx = document.getElementById('pieChart');
             if(pieCtx) {
                 if(pieChartInstance) pieChartInstance.destroy();
-                const catLabels = Object.keys(catMap);
-                const catData = Object.values(catMap);
-                
-                pieChartInstance = new Chart(pieCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: catLabels.length > 0 ? catLabels : ["データなし"],
-                        datasets: [{ data: catData.length > 0 ? catData : [1], backgroundColor: catData.length > 0 ? pieColors : ['rgba(0,0,0,0.1)'], borderWidth: 0 }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right', labels: { color: textColor } } }
-                    }
-                });
-            }
-        }
-
-            // ダークモードに応じた色の切り替え
-            const isDark = document.body.classList.contains('dark-mode');
-            const textColor = isDark ? '#fce4e8' : '#5a4b4e';
-            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-            const barColor = isDark ? '#e07b9e' : '#ff8fa9';
-            const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
-
-            // 1. 棒グラフ（日別の学習時間）
-            const barCtx = document.getElementById('barChart');
-            if(barCtx) {
-                if(barChartInstance) barChartInstance.destroy();
-                barChartInstance = new Chart(barCtx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(dateMap),
-                        datasets: [{ label: '学習時間 (h)', data: Object.values(dateMap), backgroundColor: barColor, borderRadius: 4 }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } },
-                        plugins: { legend: { labels: { color: textColor } } }
-                    }
-                });
-            }
-
-            // 2. 円グラフ（科目のバランス）
-            const pieCtx = document.getElementById('pieChart');
-            if(pieCtx) {
-                if(pieChartInstance) pieChartInstance.destroy();
-                
-                // データがない場合は空のグラフを表示しないようにする処理
-                const catLabels = Object.keys(catMap);
-                const catData = Object.values(catMap);
-                
-                pieChartInstance = new Chart(pieCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: catLabels.length > 0 ? catLabels : ["データなし"],
-                        datasets: [{ data: catData.length > 0 ? catData : [1], backgroundColor: catData.length > 0 ? pieColors : ['rgba(0,0,0,0.1)'], borderWidth: 0 }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right', labels: { color: textColor } } }
-                    }
-                });
+                const catLabels = Object.keys(catMap); const catData = Object.values(catMap);
+                pieChartInstance = new Chart(pieCtx.getContext('2d'), { type: 'doughnut', data: { labels: catLabels.length > 0 ? catLabels : ["データなし"], datasets: [{ data: catData.length > 0 ? catData : [1], backgroundColor: catData.length > 0 ? pieColors : ['rgba(0,0,0,0.1)'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: textColor } } } } });
             }
         }
     </script>
