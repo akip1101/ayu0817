@@ -4,36 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Study Dashboard</title>
+    <!-- 🎀 ここを置き換え：手書き風＆レトロなフォントを読み込む -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
+        /* 👑 テーマ変数の宣言（デフォルト：マイメロディ） */
+        :root, body[data-theme="mymelody"] {
             --bg-color: #fff0f3; --main-pink: #ff8fa9; --dark-pink: #ff6b8b; --soft-pink: #ffe3e9;
             --text-color: #5a4b4e; --text-muted: #a68a90; --card-bg: #ffffff; --border-radius: 24px;
-            --font-main: 'M PLUS Rounded 1c', sans-serif; --font-eng: 'Fredoka', sans-serif;
+            --font-main: 'Kiwi Maru', serif; --font-eng: 'Mali', cursive;
             --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-mymelody.png');
             --filter-color: rgba(255, 240, 243, 0.75);
         }
 
-        /* 🎀 21行目付近のダークモード用の上書き設定 */
-        body.dark-mode {
+        /* 👑 クロミ（ダーク・小悪魔） */
+        body[data-theme="kuromi"] {
             --bg-color: #2a1f26; --main-pink: #c96788; --dark-pink: #e07b9e; --soft-pink: #44323c;
             --text-color: #fce4e8; --text-muted: #b898a1; --card-bg: #362831;
             --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png');
             --filter-color: rgba(42, 31, 38, 0.85);
         }
 
-        /* 👑 ロック画面の画像と色合い（フィルター）をダークモード用に強制上書き */
-        body.dark-mode #lock-screen {
-            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-kuromi.png');
-            --filter-color: rgba(42, 31, 38, 0.85); /* ★色合いもダーク用に変更 */
+        /* 👑 シナモロール（パステルブルー） */
+        body[data-theme="cinnamoroll"] {
+            --bg-color: #f0f8ff; --main-pink: #7bb5e3; --dark-pink: #5a9bd4; --soft-pink: #d9efff;
+            --text-color: #3d5a73; --text-muted: #7a9ebf; --card-bg: #ffffff;
+            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/mv-cinnamon.png');
+            --filter-color: rgba(240, 248, 255, 0.85);
         }
+
+        /* 👑 ポムポムプリン（温かみイエロー） */
+        body[data-theme="pompompurin"] {
+            --bg-color: #fffce0; --main-pink: #f2c94c; --dark-pink: #d99a00; --soft-pink: #ffebb3;
+            --text-color: #594411; --text-muted: #a68a56; --card-bg: #ffffff;
+            --bg-img: url('https://www.sanrio.co.jp/wp-content/uploads/2022/06/list-pompompurin.png');
+            --filter-color: rgba(255, 252, 224, 0.85);
+        }
+
+        /* 👑 きせかえボタンのUIデザイン */
+        .theme-selector { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
+        .theme-btn { padding: 10px 14px; border-radius: 20px; border: 3px solid transparent; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: var(--font-main); font-size: 0.85rem; }
+        .theme-btn:active { transform: scale(0.95); }
+        .theme-btn.active { border-color: var(--text-color); box-shadow: 0 4px 10px rgba(0,0,0,0.15); transform: translateY(-2px); }
+        .t-my { background: #ff8fa9; color: white; }
+        .t-ku { background: #362831; color: #fce4e8; border: 2px solid #e07b9e; }
+        .t-ci { background: #7bb5e3; color: white; }
+        .t-po { background: #f2c94c; color: #594411; }
 
         body {
             font-family: var(--font-main); font-weight: 700; background-color: var(--bg-color);
@@ -287,8 +309,13 @@
                 <section class="notebook-card">
                     <h3 class="card-title">各種設定</h3>
                     <div class="form-group" style="margin-bottom: 25px;">
-                        <label>ダークモード（クロミちゃん仕様）:</label>
-                        <button class="btn-execute" id="dark-mode-btn" style="background-color: var(--soft-pink); color: var(--text-color);" onclick="toggleDarkMode()">🌙 ダークモードをON</button>
+                        <label style="color: var(--dark-pink); text-align: center; font-size: 1rem;">✨ アプリのきせかえ ✨</label>
+                        <div class="theme-selector">
+                            <button class="theme-btn t-my active" onclick="changeTheme('mymelody')">マイメロ</button>
+                            <button class="theme-btn t-ku" onclick="changeTheme('kuromi')">クロミ</button>
+                            <button class="theme-btn t-ci" onclick="changeTheme('cinnamoroll')">シナモン</button>
+                            <button class="theme-btn t-po" onclick="changeTheme('pompompurin')">プリン</button>
+                        </div>
                     </div>
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label>今週の目標時間 (h):</label>
@@ -311,9 +338,9 @@
     
     <script>
         // 🎀アプリ起動の瞬間にダークモードの記憶を最優先で適用する
-        if (localStorage.getItem('darkMode') === 'on') {
-            document.body.classList.add('dark-mode');
-        }
+        // 👑 アプリ起動時、最優先で保存されたテーマを読み込み
+        const savedTheme = localStorage.getItem('appTheme') || 'mymelody';
+        document.body.setAttribute('data-theme', savedTheme);
         const firebaseConfig = { apiKey: "AIzaSyB_MD8LTgOjwg_-SO8_Gcb8RLZmqc2iItw", authDomain: "gohoubipt.firebaseapp.com", databaseURL: "https://gohoubipt-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "gohoubipt", storageBucket: "gohoubipt.appspot.com", messagingSenderId: "133130532450", appId: "1:133130532450:web:41476b156bb892e62e833b" };
         // 👑 数字を高速で回す（Tween補間）アニメーション関数
         function animateValue(obj, start, end, duration, suffix = "") {
@@ -360,24 +387,18 @@
         }
         function switchView(viewName) { document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(btn => { if(btn.getAttribute('onclick').includes(viewName)) btn.classList.add('active'); else btn.classList.remove('active'); }); if(viewName === 'analytics') renderCharts(); }
         function switchUser(userKey) { if(currentUser === userKey) return; currentUser = userKey; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${userKey}`).classList.add('active'); if(dbListenerRef) dbListenerRef.off(); startListening(); }
-        function toggleDarkMode() {
-        const body = document.body;
-        body.classList.toggle('dark-mode');
-        const btn = document.getElementById('dark-mode-btn');
-        
-        // 🎀 現在の状態をブラウザに保存する処理を追加
-        const isDark = body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDark ? 'on' : 'off');
+        // 👑 選択したテーマを適用し、すべてのUIを一元更新する関数
+        function changeTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('appTheme', themeName);
+            
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(themeName)) btn.classList.add('active');
+            });
 
-            if(body.classList.contains('dark-mode')){
-                btn.innerText = "☀️ ライトモードに戻す";
-                btn.style.backgroundColor = "#c96788";
-                btn.style.color = "#fff";
-            } else {
-                btn.innerText = "🌙 ダークモードをON";
-                btn.style.backgroundColor = "var(--soft-pink)";
-                btn.style.color = "var(--text-color)";
-            }
+            // グラフを開いている場合は色もテーマに合わせて再描画
             if(document.getElementById('view-analytics').classList.contains('active')) renderCharts();
         }
         let timerSec = 0; let timerInterval = null;
@@ -522,10 +543,20 @@
                         }
                     }
                 }
-            }); // 🎀 ここに閉じカッコが抜けていました
+            }); 
 
-            const isDark = document.body.classList.contains('dark-mode'); const textColor = isDark ? '#fce4e8' : '#5a4b4e'; const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'; const barColor = isDark ? '#e07b9e' : '#ff8fa9'; const pieColors = isDark ? ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'] : ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
-
+            // 👑 現在のテーマのCSS変数を読み取って、グラフの色を動的に生成
+            const rootStyles = getComputedStyle(document.body);
+            const textColor = rootStyles.getPropertyValue('--text-color').trim();
+            const gridColor = rootStyles.getPropertyValue('--soft-pink').trim();
+            const barColor = rootStyles.getPropertyValue('--main-pink').trim();
+            
+            const currentTheme = document.body.getAttribute('data-theme') || 'mymelody';
+            let pieColors = ['#ff8fa9', '#ff6b8b', '#ffe3e9', '#a68a90', '#f4c2c2', '#d8a1aa'];
+            if (currentTheme === 'kuromi') pieColors = ['#c96788', '#9e848b', '#44323c', '#e07b9e', '#7b5e67', '#a87a88'];
+            else if (currentTheme === 'cinnamoroll') pieColors = ['#7bb5e3', '#5a9bd4', '#d9efff', '#3d5a73', '#9bc6e8', '#b5d5ed'];
+            else if (currentTheme === 'pompompurin') pieColors = ['#f2c94c', '#d99a00', '#ffebb3', '#594411', '#f5d670', '#f7e296'];
+            
             const barCtx = document.getElementById('barChart');
             if(barCtx) {
                 if(barChartInstance) barChartInstance.destroy();
